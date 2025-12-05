@@ -1,452 +1,419 @@
 # MiniBonk
 
-A survivor-like roguelite prototype inspired by MegaBonk (2025). Built in Unreal Engine 5 with C++ as a learning project.
+A survivor-like roguelite prototype built in Unreal Engine 5.7 with C++ as a learning project.
 
-## Tech Stack
-
-- **Engine:** Unreal Engine 5 (5.7)
-- **Language:** C++
-- **IDE:** Visual Studio
-- **Version Control:** GitHub
+**Engine:** UE 5.7 | **Language:** C++ | **IDE:** Visual Studio | **VCS:** GitHub
 
 ---
 
 ## Game Overview
 
-Auto-attack roguelite where the player navigates a small 3D world while enemies spawn in waves. Collect coins from enemies and the environment, level up, choose upgrades, and survive as long as possible.
+Auto-attack roguelite where the player navigates a 3D arena while enemies spawn in waves. Collect coins, level up, choose upgrades, survive.
 
 **Core Loop:**
-
 1. Enemies spawn and chase player
 2. Player auto-attacks nearby enemies
 3. Enemies drop coins on death
 4. Collect coins → level up → choose upgrade
 5. Difficulty scales over time
-6. Survive until death or defeat boss
+6. Survive until death (or optional boss defeat)
 
 ---
 
-## Game Systems
+## MVP Scope
 
 ### Player
-
-| Feature | Description |
-|---------|-------------|
-| Movement | Simple Third Person movement. Speed/jump height modifiable via upgrades |
-| Health | Numeric HP system. Death when HP < 1. Upgradeable |
-| Auto-Attack | Fires automatically. Types: long-range projectile, close-range slash |
-| Special Pickups | Temporary power boosts (nuke/instakill style) |
+- Third-person movement (speed/jump modifiable)
+- Health system (damage, death, upgradeable)
+- Auto-attack (projectile + melee slash)
 
 ### Enemies
+- 2 enemy types (basic chaser + variant)
+- 1 mini-boss (ranged attacks)
+- Chase AI, health, death, coin drops
+- Contact damage with cooldown
 
-| Feature | Description |
-|---------|-------------|
-| Types | 2 regular enemy types + 1 mini-boss for MVP |
-| Behavior | Chasers. Mini-boss has ranged attacks |
-| Scaling | Health increases over time |
-
-### Spawning
-
-| Feature | Description |
-|---------|-------------|
-| Location | Outside a minimum range from player. Closer = higher spawn probability, farther = lower but possible |
-| Difficulty | Time-based ramp up |
-
-### Progression
-
-| Feature | Description |
-|---------|-------------|
-| Coin Drops | Varies by enemy type + randomness factor. Intentionally hard to keep up with difficulty |
-| Pickup Radius | Upgradeable |
-| Level-Up Cost | Scaling (more coins needed per level) |
-| Upgrade Selection | Spin wheel with 3 random options. Upgrades stack (e.g., ATK +5% → ATK +10% with two). Chance for "critical" rolls (double upgrade or rare option) |
-
-### Interactables
-
-| Feature | Description |
-|---------|-------------|
-| Chests | Same rewards as level-ups but cost coins. Price ramps with difficulty. Existing chests keep original price |
-| Power-Up Drops | Heal, speed boost, mega-coin (MVP) |
+### Systems
+- **Spawning:** Distance-based probability, time-scaling difficulty
+- **Economy:** Coin pickups, upgradeable pickup radius
+- **Progression:** Level-up thresholds, upgrade wheel (3 options), stackable upgrades
+- **Interactables:** Chests (cost coins → random upgrade), power-ups (heal, speed, mega-coin)
 
 ### World
-
-| Feature | Description |
-|---------|-------------|
-| Maps | 1 map for MVP |
-| Size | Large enough to navigate/kite enemies |
-| Boundaries | Walls. Max jump height capped to prevent escaping |
-
-### Game Loop
-
-| State | Description |
-|-------|-------------|
-| Start | Menu screen. Spend excess coins on permanent upgrades |
-| Win Condition | Kill boss (optional) or endless survival |
-| Lose Condition | Player death (HP < 1) |
-| Post-Game | Excess coins added to separate persistent counter for menu upgrades |
+- Single arena map with boundary walls
+- Nav mesh coverage
 
 ### UI
-
-- Health bar
-- Coin counter
-- Level / XP progress bar
-- Upgrade selection screen (spin wheel)
-- Menu for permanent upgrades
+- Health bar, coin counter, XP bar
+- Upgrade selection screen
+- Game over screen
 
 ---
 
+## Checklist
 
-
-## Setup / Infrastructure
-
-- [ ] Project created
-- [ ] File structure (Public/Private folders)
+### Setup
+- [x] Project created
+- [x] Public/Private folder structure
 - [ ] GitHub repo initialized
 
----
-
-## Player System
-
-**Movement**
-
+### Player System
 - [ ] Basic movement
-- [ ] Speed modifier (for upgrades)
-- [ ] Jump height modifier (for upgrades)
+- [ ] Speed/jump modifiers
+- [ ] Health component
+- [ ] Take damage / death
+- [ ] Auto-attack (timer, melee, projectile)
+- [ ] Attack stat modifiers (speed, damage, range)
 
-**Health**
+### Enemy System
+- [ ] Base enemy class
+- [ ] AI chase behavior
+- [ ] Health / damage / death
+- [ ] Coin drops on death
+- [ ] Enemy variant (different stats)
+- [ ] Mini-boss (ranged attack)
+- [ ] Contact damage with cooldown
 
-- [ ] Health component/variable
-- [ ] Take damage function
-- [ ] Death state
-- [ ] Health upgradeable via progression
+### Spawning
+- [ ] Spawn manager
+- [ ] Distance-based spawn logic
+- [ ] Time-based difficulty scaling
+- [ ] Weighted enemy selection
+- [ ] Mini-boss trigger
 
-**Auto-Attack**
+### Economy & Progression
+- [ ] Coin actor + collection
+- [ ] Coin counter
+- [ ] Level-up threshold (scaling)
+- [ ] Upgrade selection UI
+- [ ] Apply upgrades to player
+- [ ] Pickup radius (base + upgradeable)
 
-- [ ] Auto-attack timer/interval
-- [ ] Close-range slash attack
-- [ ] Long-range projectile attack
-- [ ] Damage enemies in range
-- [ ] Attack speed upgradeable
-- [ ] Attack damage upgradeable
-- [ ] Attack range upgradeable
+### Interactables
+- [ ] Chest actor (interaction, cost, reward)
+- [ ] Power-up drops (heal, speed, mega-coin)
 
----
-
-## Enemy System
-
-**Enemy Type 1 (Basic Chaser)**
-
-- [ ] Character class created
-- [ ] AI Controller created
-- [ ] Chase behavior (moves toward player)
-- [ ] Health variable
-- [ ] Take damage function
-- [ ] Death (destroy actor)
-- [ ] Drop coins on death
-
-**Enemy Type 2 (Chaser Variant)**
-
-- [ ] Character class
-- [ ] Different stats (speed/health/damage)
-- [ ] Visual distinction
-- [ ] Drop coins on death
-
-**Mini-Boss**
-
-- [ ] Character class
-- [ ] Higher health pool
-- [ ] Chase behavior
-- [ ] Ranged attack ability
-- [ ] Drop more coins on death
-- [ ] Spawn trigger (time-based or kill-based)
-
-**Enemy Damage**
-
-- [ ] Enemies damage player on contact
-- [ ] Damage cooldown (no instant kill)
-
----
-
-## Spawning System
-
-- [ ] Spawn manager actor
-- [ ] Spawn outside minimum range from player
-- [ ] Spawn probability (closer = higher chance)
-- [ ] Time-based spawn rate
-- [ ] Difficulty scaling (more enemies over time)
-- [ ] Enemy type selection (weighted random)
-- [ ] Mini-boss spawn trigger
-
----
-
-## Economy System
-
-**Coins**
-
-- [ ] Coin actor/pickup class
-- [ ] Coins spawn on enemy death
-- [ ] Coin value varies by enemy type
-- [ ] Random variance on drop amount
-- [ ] Player can collect coins (overlap)
-- [ ] Coin counter variable
-
-**Pickup Radius**
-
-- [ ] Base pickup radius
-- [ ] Upgradeable pickup radius
-
----
-
-## Progression System
-
-**Leveling**
-
-- [ ] XP/coin threshold for level up
-- [ ] Scaling threshold (more coins per level)
-- [ ] Level up event/trigger
-
-**Upgrade Selection**
-
-- [ ] Upgrade selection UI (3 options)
-- [ ] Random upgrade pool
-- [ ] Stackable upgrades (ATK +5% → +10%)
-- [ ] Apply selected upgrade to player
-
-**Upgrade Types (minimum 5)**
-
-- [ ] Attack damage increase
-- [ ] Attack speed increase
-- [ ] Attack range increase
-- [ ] Movement speed increase
-- [ ] Max health increase
-- [ ] Pickup radius increase
-- [ ] (Optional) Critical roll chance for rare/double upgrades
-
----
-
-## Interactables
-
-**Chests**
-
-- [ ] Chest actor class
-- [ ] Interaction prompt
-- [ ] Cost coins to open
-- [ ] Give random upgrade on open
-- [ ] Price scales with difficulty
-- [ ] Existing chests keep original price
-
-**Power-Up Drops**
-
-- [ ] Heal drop (restore HP)
-- [ ] Speed boost drop (temporary)
-- [ ] Mega-coin drop (large coin value)
-- [ ] (Polish) Nuke/instakill drop
-
----
-
-## World / Level
-
-- [ ] Playable area designed
-- [ ] Boundary walls
-- [ ] Floor with nav mesh coverage
-- [ ] Chest spawn locations
-- [ ] Visual landmarks (optional)
-
----
-
-## UI
-
-- [ ] Health bar display
-- [ ] Coin counter display
-- [ ] Level/XP progress bar
-- [ ] Upgrade selection screen
+### World & UI
+- [ ] Arena with boundaries
+- [ ] Nav mesh
+- [ ] HUD (health, coins, XP)
+- [ ] Upgrade wheel
 - [ ] Game over screen
-- [ ] (Secondary) Start menu
-- [ ] (Secondary) Permanent upgrade menu
 
----
-
-## Game Loop / State
-
-**Game States**
-
-- [ ] Playing state
-- [ ] Paused state (upgrade selection)
-- [ ] Game over state
-
-**Start**
-
-- [ ] (Secondary) Start menu
-- [ ] (Secondary) Persistent currency display
-- [ ] (Secondary) Permanent upgrades purchase
-
-**End**
-
-- [ ] Detect player death
-- [ ] Show game over screen
-- [ ] (Secondary) Add excess coins to persistent currency
+### Game State
+- [ ] Playing / paused / game over states
+- [ ] Death detection → game over
 - [ ] Restart option
 
-**Win Condition (Optional)**
-
-- [ ] Boss spawn trigger
-- [ ] Boss defeat = win
-- [ ] Win screen
-
----
-
-## Polish / Juice
-
-**Audio**
-
-- [ ] Hit sounds
-- [ ] Enemy death sounds
-- [ ] Coin pickup sound
-- [ ] Level-up jingle
-- [ ] Background music
-
-**Visual Effects**
-
-- [ ] Screen shake on hit
-- [ ] Damage numbers
-- [ ] Enemy death particles
-- [ ] Level-up effect
-- [ ] Upgrade selection animation (spin wheel)
+### Polish (Secondary)
+- [ ] Audio (hits, death, coins, music)
+- [ ] VFX (particles, screen shake, damage numbers)
+- [ ] Start menu
+- [ ] Persistent currency / permanent upgrades
 
 ---
 
-## UE5 C++ Quick Reference
+## Quick Reference
+
+### Naming Conventions
+
+**C++ Classes**
+| Type | Prefix | Example |
+|------|--------|---------|
+| Actor | A | `AEnemyBase` |
+| UObject / Component | U | `UHealthComponent` |
+| Struct | F | `FDamageInfo` |
+| Enum | E | `EGameState` |
+| Interface | I | `IDamageable` |
+| Bool variable | b | `bIsAlive` |
+
+**Content Assets**
+| Type | Prefix | Example |
+|------|--------|---------|
+| Blueprint | BP_ | `BP_Enemy` |
+| Static Mesh | SM_ | `SM_Coin` |
+| Skeletal Mesh | SK_ | `SK_Player` |
+| Material | M_ | `M_Ground` |
+| Material Instance | MI_ | `MI_Ground_Wet` |
+| Texture | T_ | `T_Rock_D` (diffuse), `T_Rock_N` (normal) |
+| Animation | A_ | `A_Run` |
+| Anim Blueprint | ABP_ | `ABP_Player` |
+| Anim Montage | AM_ | `AM_Attack` |
+| Particle System | PS_ | `PS_Explosion` |
+| Sound | A_ | `A_Hit`, `A_Hit_Cue` |
+| Widget | WBP_ | `WBP_HUD` |
+| Data Table | DT_ | `DT_Enemies` |
 
 ---
 
-### Getting References
+### Folder Structure
 
+**Source (C++)**
+```
+Source/MiniBonk/
+├── Public/              # .h files
+│   ├── Core/            # GameMode, GameState
+│   ├── Characters/      # Player, enemies
+│   ├── Components/      # Health, attack, etc.
+│   ├── Systems/         # Spawning, progression
+│   ├── Actors/          # Coins, chests, projectiles
+│   ├── UI/              # HUD classes
+│   └── Data/            # Structs, enums
+└── Private/             # .cpp files (mirror Public)
+```
+
+**Content (Assets)**
+```
+Content/MiniBonk/
+├── Core/                # GameMode BP, essential BPs
+├── Characters/
+│   ├── Player/
+│   │   ├── Animations/
+│   │   └── Meshes/
+│   └── Enemies/
+├── Pickups/             # Coins, power-ups
+├── Effects/             # Particles
+├── Audio/
+├── UI/
+├── Maps/
+└── Data/                # DataTables
+```
+
+---
+
+### Header File Template
+
+```cpp
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "MyActor.generated.h"  // Always last
+
+class UMyComponent;  // Forward declare when possible
+
+UCLASS()
+class MINIBONK_API AMyActor : public AActor
+{
+    GENERATED_BODY()
+
+public:
+    AMyActor();
+
+protected:
+    virtual void BeginPlay() override;
+
+private:
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    TObjectPtr<UMyComponent> MyComponent;
+};
+```
+
+**Include Order:**
+1. `#pragma once`
+2. `CoreMinimal.h`
+3. Engine headers
+4. Project headers
+5. `.generated.h` (must be last)
+
+**Forward Declarations:** Use in headers when you only need pointers/references. Include the actual header in the .cpp file.
+
+---
+
+### UPROPERTY
+
+```cpp
+// Designer-tweakable value
+UPROPERTY(EditDefaultsOnly, Category = "Stats")
+float MaxHealth = 100.f;
+
+// Runtime state, BP readable
+UPROPERTY(BlueprintReadOnly, Category = "Stats")
+float CurrentHealth;
+
+// Component reference
+UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+TObjectPtr<UHealthComponent> HealthComp;
+
+// Class reference for spawning
+UPROPERTY(EditDefaultsOnly, Category = "Config")
+TSubclassOf<AActor> ProjectileClass;
+```
+
+| Specifier | Use Case |
+|-----------|----------|
+| `EditDefaultsOnly` | Tweakable in BP defaults only |
+| `EditAnywhere` | Tweakable everywhere |
+| `VisibleAnywhere` | Read-only display |
+| `BlueprintReadOnly` | BP can read |
+| `BlueprintReadWrite` | BP can read/write |
+
+---
+
+### UFUNCTION
+
+```cpp
+// BP can call
+UFUNCTION(BlueprintCallable, Category = "Combat")
+void TakeDamage(float Amount);
+
+// Getter (no exec pin in BP)
+UFUNCTION(BlueprintPure, Category = "Stats")
+float GetHealthPercent() const;
+
+// BP can override
+UFUNCTION(BlueprintNativeEvent, Category = "Events")
+void OnDeath();
+void OnDeath_Implementation();  // Required
+```
+
+---
+
+### Object Creation
+
+```cpp
+// Constructor - components
+HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
+
+// Runtime - UObjects
+UMyObject* Obj = NewObject<UMyObject>(this);
+
+// Runtime - Actors
+AActor* Actor = GetWorld()->SpawnActor<AMyActor>(Location, Rotation);
+```
+
+---
+
+### Debugging
+
+**Assertions**
+```cpp
+// Non-fatal: logs error, continues execution
+ensure(Pointer != nullptr);
+ensureMsgf(Value > 0, TEXT("Expected positive value, got %d"), Value);
+
+// Fatal in dev builds: halts execution
+check(Pointer != nullptr);
+checkf(Index >= 0, TEXT("Invalid index: %d"), Index);
+```
+
+Use `ensure()` liberally during development to catch issues without crashing.
+
+**Logging**
+```cpp
+UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
+UE_LOG(LogTemp, Error, TEXT("Actor is null!"));
+
+// On-screen
+if (GEngine)
+{
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Debug"));
+}
+```
+
+**Visual Debug**
+```cpp
+#include "DrawDebugHelpers.h"
+
+DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, 0.f);
+DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.f);
+```
+
+---
+
+### Common Patterns
+
+**Timers**
+```cpp
+FTimerHandle TimerHandle;
+
+// Looping
+GetWorldTimerManager().SetTimer(TimerHandle, this, &AMyClass::OnTimer, Rate, true);
+
+// One-shot
+GetWorldTimerManager().SetTimer(TimerHandle, this, &AMyClass::OnTimer, Delay, false);
+
+// Stop
+GetWorldTimerManager().ClearTimer(TimerHandle);
+```
+
+**Overlap Events**
+```cpp
+// Header
+UFUNCTION()
+void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+    bool bFromSweep, const FHitResult& SweepResult);
+
+// BeginPlay
+CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyClass::OnOverlapBegin);
+```
+
+**Casting**
+```cpp
+if (AMiniBonkCharacter* Player = Cast<AMiniBonkCharacter>(OtherActor))
+{
+    Player->TakeDamage(Damage);
+}
+```
+
+**Getting References**
 ```cpp
 // Player
 APawn* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
-// Component on an actor
-UMyComponent* Comp = MyActor->FindComponentByClass<UMyComponent>();
+// Game Mode
+AMiniBonkGameMode* GM = Cast<AMiniBonkGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-// Game mode
-AMyGameMode* GM = Cast<AMyGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+// Component
+UHealthComp* Health = Actor->FindComponentByClass<UHealthComp>();
 ```
 
----
-
-### Logging
-
+**Random**
 ```cpp
-UE_LOG(LogTemp, Warning, TEXT("Message here"));
-UE_LOG(LogTemp, Warning, TEXT("Value: %f"), SomeFloat);
-UE_LOG(LogTemp, Warning, TEXT("Name: %s"), *SomeString);
+float RandFloat = FMath::RandRange(1.f, 10.f);
+int32 RandInt = FMath::RandRange(1, 10);
 
-// On-screen (good for runtime debugging)
-GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hello"));
+if (FMath::FRand() < 0.3f) { /* 30% chance */ }
 ```
 
----
-
-### Timers
-
-```cpp
-// Header
-FTimerHandle MyTimerHandle;
-
-// Repeating timer
-GetWorldTimerManager().SetTimer(MyTimerHandle, this, &AMyClass::MyFunction, 1.0f, true);
-
-// One-shot timer
-GetWorldTimerManager().SetTimer(MyTimerHandle, this, &AMyClass::MyFunction, 1.0f, false);
-
-// Stop timer
-GetWorldTimerManager().ClearTimer(MyTimerHandle);
-```
-
----
-
-### Random
-
-```cpp
-float RandomFloat = FMath::RandRange(1.f, 10.f);
-int32 RandomInt = FMath::RandRange(1, 10);  // Inclusive
-
-// Chance (30%)
-if (FMath::FRand() < 0.3f) { }
-```
-
----
-
-### Distance
-
+**Distance**
 ```cpp
 float Dist = FVector::Dist(GetActorLocation(), Other->GetActorLocation());
 ```
 
 ---
 
-### Casting
+### Design Principles
 
+**Separation of Concerns**
+- One class = one responsibility
+- Use components for reusable behavior (HealthComponent, AttackComponent)
+- Systems manage global logic (SpawnManager, ProgressionManager)
+- Actors are the "things" in the world
+
+**Composition Over Inheritance**
+- Prefer adding components to creating deep class hierarchies
+- Base classes for shared interface, components for shared behavior
+
+**Data-Driven**
+- Use DataTables for tunable values (enemy stats, upgrade definitions)
+- `EditDefaultsOnly` properties for per-class configuration
+- Easier to tweak without recompiling
+
+**Pointer Safety**
 ```cpp
-AMyCharacter* Player = Cast<AMyCharacter>(OtherActor);
-if (Player)
+// Always validate before use
+if (IsValid(MyActor))
 {
-    // Safe to use
+    MyActor->DoSomething();
 }
-```
 
----
+// UPROPERTY prevents garbage collection issues
+UPROPERTY()
+TObjectPtr<AActor> MyActor;  // Safe
 
-### Overlap Event Signature
-
-```cpp
-// Header
-UFUNCTION()
-void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
-        UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
-        bool bFromSweep, const FHitResult& SweepResult);
-
-// Bind in BeginPlay
-MyCollision->OnComponentBeginOverlap.AddDynamic(this, &AMyClass::OnOverlapBegin);
-```
-
----
-
-### UPROPERTY Cheat Sheet
-
-| You want... | Use |
-|-------------|-----|
-| Editable everywhere | `EditAnywhere` |
-| Editable only in Blueprint defaults | `EditDefaultsOnly` |
-| Visible but not editable | `VisibleAnywhere` |
-| Blueprint can read | `BlueprintReadOnly` |
-| Blueprint can read/write | `BlueprintReadWrite` |
-| Class reference (for spawning) | `TSubclassOf<AMyClass>` |
-
-```cpp
-UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-float MaxHealth = 100.f;
-```
-
----
-
-### UFUNCTION Cheat Sheet
-
-| You want... | Use |
-|-------------|-----|
-| Blueprint can call it | `BlueprintCallable` |
-| Blueprint can override it | `BlueprintNativeEvent` |
-| No side effects (getter) | `BlueprintPure` |
-
----
-
-### Debug Drawing
-
-```cpp
-#include "DrawDebugHelpers.h"
-
-DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, 0.1f);
-DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f);
+AActor* RawPointer;  // Dangerous - can become dangling
 ```
 
 ---
@@ -454,8 +421,8 @@ DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.1f);
 ### Common Includes
 
 ```cpp
-#include "Kismet/GameplayStatics.h"     // Most utility functions
-#include "Kismet/KismetMathLibrary.h"   // Extra math
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
 #include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
