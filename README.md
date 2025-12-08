@@ -55,10 +55,11 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 ### Setup
 - [x] Project created
 - [x] Public/Private folder structure
-- [ ] GitHub repo initialized
+- [X] GitHub repo initialized
 
 ### Player System
-- [ ] Basic movement
+- [X] Basic movement
+- [ ] Basic camera movement
 - [ ] Speed/jump modifiers
 - [ ] Health component
 - [ ] Take damage / death
@@ -146,69 +147,6 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 
 ---
 
-### Folder Structure
-
-**Source (C++)**
-```
-Source/MiniBonk/
-├── Public/              # .h files
-│   ├── Core/            # GameMode, GameState
-│   ├── Characters/      # Player, enemies
-│   ├── Components/      # Health, attack, etc.
-│   ├── Systems/         # Spawning, progression
-│   ├── Actors/          # Coins, chests, projectiles
-│   ├── UI/              # HUD classes
-│   └── Data/            # Structs, enums
-└── Private/             # .cpp files (mirror Public)
-```
-
-**Content (Assets)**
-```
-Content/MiniBonk/
-├── Core/                # GameMode BP, essential BPs
-├── Characters/
-│   ├── Player/
-│   │   ├── Animations/
-│   │   └── Meshes/
-│   └── Enemies/
-├── Pickups/             # Coins, power-ups
-├── Effects/             # Particles
-├── Audio/
-├── UI/
-├── Maps/
-└── Data/                # DataTables
-```
-
----
-
-### Header File Template
-
-```cpp
-#pragma once
-
-#include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "MyActor.generated.h"  // Always last
-
-class UMyComponent;  // Forward declare when possible
-
-UCLASS()
-class MINIBONK_API AMyActor : public AActor
-{
-    GENERATED_BODY()
-
-public:
-    AMyActor();
-
-protected:
-    virtual void BeginPlay() override;
-
-private:
-    UPROPERTY(VisibleAnywhere, Category = "Components")
-    TObjectPtr<UMyComponent> MyComponent;
-};
-```
-
 **Include Order:**
 1. `#pragma once`
 2. `CoreMinimal.h`
@@ -222,24 +160,6 @@ private:
 
 ### UPROPERTY
 
-```cpp
-// Designer-tweakable value
-UPROPERTY(EditDefaultsOnly, Category = "Stats")
-float MaxHealth = 100.f;
-
-// Runtime state, BP readable
-UPROPERTY(BlueprintReadOnly, Category = "Stats")
-float CurrentHealth;
-
-// Component reference
-UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-TObjectPtr<UHealthComponent> HealthComp;
-
-// Class reference for spawning
-UPROPERTY(EditDefaultsOnly, Category = "Config")
-TSubclassOf<AActor> ProjectileClass;
-```
-
 | Specifier | Use Case |
 |-----------|----------|
 | `EditDefaultsOnly` | Tweakable in BP defaults only |
@@ -247,40 +167,6 @@ TSubclassOf<AActor> ProjectileClass;
 | `VisibleAnywhere` | Read-only display |
 | `BlueprintReadOnly` | BP can read |
 | `BlueprintReadWrite` | BP can read/write |
-
----
-
-### UFUNCTION
-
-```cpp
-// BP can call
-UFUNCTION(BlueprintCallable, Category = "Combat")
-void TakeDamage(float Amount);
-
-// Getter (no exec pin in BP)
-UFUNCTION(BlueprintPure, Category = "Stats")
-float GetHealthPercent() const;
-
-// BP can override
-UFUNCTION(BlueprintNativeEvent, Category = "Events")
-void OnDeath();
-void OnDeath_Implementation();  // Required
-```
-
----
-
-### Object Creation
-
-```cpp
-// Constructor - components
-HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
-
-// Runtime - UObjects
-UMyObject* Obj = NewObject<UMyObject>(this);
-
-// Runtime - Actors
-AActor* Actor = GetWorld()->SpawnActor<AMyActor>(Location, Rotation);
-```
 
 ---
 
@@ -297,8 +183,6 @@ check(Pointer != nullptr);
 checkf(Index >= 0, TEXT("Invalid index: %d"), Index);
 ```
 
-Use `ensure()` liberally during development to catch issues without crashing.
-
 **Logging**
 ```cpp
 UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
@@ -309,111 +193,6 @@ if (GEngine)
 {
     GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Debug"));
 }
-```
-
-**Visual Debug**
-```cpp
-#include "DrawDebugHelpers.h"
-
-DrawDebugSphere(GetWorld(), Location, Radius, 12, FColor::Red, false, 0.f);
-DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 0.f);
-```
-
----
-
-### Common Patterns
-
-**Timers**
-```cpp
-FTimerHandle TimerHandle;
-
-// Looping
-GetWorldTimerManager().SetTimer(TimerHandle, this, &AMyClass::OnTimer, Rate, true);
-
-// One-shot
-GetWorldTimerManager().SetTimer(TimerHandle, this, &AMyClass::OnTimer, Delay, false);
-
-// Stop
-GetWorldTimerManager().ClearTimer(TimerHandle);
-```
-
-**Overlap Events**
-```cpp
-// Header
-UFUNCTION()
-void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
-    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-    bool bFromSweep, const FHitResult& SweepResult);
-
-// BeginPlay
-CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AMyClass::OnOverlapBegin);
-```
-
-**Casting**
-```cpp
-if (AMiniBonkCharacter* Player = Cast<AMiniBonkCharacter>(OtherActor))
-{
-    Player->TakeDamage(Damage);
-}
-```
-
-**Getting References**
-```cpp
-// Player
-APawn* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-// Game Mode
-AMiniBonkGameMode* GM = Cast<AMiniBonkGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
-// Component
-UHealthComp* Health = Actor->FindComponentByClass<UHealthComp>();
-```
-
-**Random**
-```cpp
-float RandFloat = FMath::RandRange(1.f, 10.f);
-int32 RandInt = FMath::RandRange(1, 10);
-
-if (FMath::FRand() < 0.3f) { /* 30% chance */ }
-```
-
-**Distance**
-```cpp
-float Dist = FVector::Dist(GetActorLocation(), Other->GetActorLocation());
-```
-
----
-
-### Design Principles
-
-**Separation of Concerns**
-- One class = one responsibility
-- Use components for reusable behavior (HealthComponent, AttackComponent)
-- Systems manage global logic (SpawnManager, ProgressionManager)
-- Actors are the "things" in the world
-
-**Composition Over Inheritance**
-- Prefer adding components to creating deep class hierarchies
-- Base classes for shared interface, components for shared behavior
-
-**Data-Driven**
-- Use DataTables for tunable values (enemy stats, upgrade definitions)
-- `EditDefaultsOnly` properties for per-class configuration
-- Easier to tweak without recompiling
-
-**Pointer Safety**
-```cpp
-// Always validate before use
-if (IsValid(MyActor))
-{
-    MyActor->DoSomething();
-}
-
-// UPROPERTY prevents garbage collection issues
-UPROPERTY()
-TObjectPtr<AActor> MyActor;  // Safe
-
-AActor* RawPointer;  // Dangerous - can become dangling
 ```
 
 ---
