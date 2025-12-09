@@ -59,7 +59,7 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 
 ### Player System
 - [X] Basic movement
-- [ ] Basic camera movement
+- [X] Basic camera movement
 - [ ] Speed/jump modifiers
 - [ ] Health component
 - [ ] Take damage / death
@@ -67,9 +67,10 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 - [ ] Attack stat modifiers (speed, damage, range)
 
 ### Enemy System
-- [ ] Base enemy class
-- [ ] AI chase behavior
-- [ ] Health / damage / death
+- [X] Base enemy class
+- [X] AI chase behavior
+- [ ] Health component
+- [ ] Take damage / death
 - [ ] Coin drops on death
 - [ ] Enemy variant (different stats)
 - [ ] Mini-boss (ranged attack)
@@ -206,4 +207,6 @@ if (GEngine)
 #include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 ```
