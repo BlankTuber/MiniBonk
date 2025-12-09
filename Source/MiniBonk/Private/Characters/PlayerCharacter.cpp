@@ -13,7 +13,7 @@ APlayerCharacter::APlayerCharacter()
 
 	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
 	MovementComp->bOrientRotationToMovement = true;
-	MovementComp->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+	MovementComp->RotationRate = FRotator(0.f, 500.f, 0.f);
 
 	MovementComp->MaxWalkSpeed = 500.f;
 	MovementComp->MaxAcceleration = 2048.f;
@@ -27,7 +27,7 @@ APlayerCharacter::APlayerCharacter()
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 500.0f;
+	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->SocketOffset = FVector(0.f, 50.f, 50.f);
 	CameraBoom->bUsePawnControlRotation = true;
 

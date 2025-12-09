@@ -8,7 +8,7 @@ void AMinibonkPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetControlRotation(FRotator(-25.0f, 0.0f, 0.0f));
+	SetControlRotation(FRotator(-25.f, 0.f, 0.f));
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
