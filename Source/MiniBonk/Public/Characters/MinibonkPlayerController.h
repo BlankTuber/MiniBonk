@@ -26,8 +26,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> JumpAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> LookAction;
+
 private:
 	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 	void StartJump();
 	void StopJump();
 };

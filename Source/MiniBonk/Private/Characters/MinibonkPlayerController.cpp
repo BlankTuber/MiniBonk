@@ -7,8 +7,8 @@
 void AMinibonkPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SetControlRotation(FRotator(-45.0f, 0.0f, 0.0f));
+
+	SetControlRotation(FRotator(-25.0f, 0.0f, 0.0f));
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
@@ -32,6 +32,11 @@ void AMinibonkPlayerController::SetupInputComponent()
 	if (ensure(MoveAction))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMinibonkPlayerController::Move);
+	}
+
+	if (ensure(LookAction))
+	{
+		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMinibonkPlayerController::Look);
 	}
 
 	if (ensure(JumpAction))
@@ -59,6 +64,52 @@ void AMinibonkPlayerController::Move(const FInputActionValue& Value)
 
 	ControlledPawn->AddMovementInput(ForwardDirection, MovementVector.Y);
 	ControlledPawn->AddMovementInput(RightDirection, MovementVector.X);
+}
+
+void AMinibonkPlayerController::Look(const FInputActionValue& Value)
+{
+	const FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	FRotator CurrentRotation = GetControlRotation();
+	float CurrentPitch = FRotator::NormalizeAxis(CurrentRotation.Pitch);
+
+	const float MinPitch = -75.f;
+	const float MaxPitch = 75.f;
+	const float ComfortZoneMin = -40.f;
+	const float ComfortZoneMax = 40.f;
+
+	float PitchInputScale = 1.f;
+
+	if (CurrentPitch > ComfortZoneMin && CurrentPitch < ComfortZoneMax)
+	{
+		PitchInputScale = 0.35f;
+	}
+	else
+	{
+		float DistanceIntoEdgeZone = 0.f;
+
+		if (CurrentPitch >= ComfortZoneMax)
+		{
+			DistanceIntoEdgeZone = (CurrentPitch - ComfortZoneMax) / (MaxPitch - ComfortZoneMax);
+		}
+		else if (CurrentPitch <= ComfortZoneMin)
+		{
+			DistanceIntoEdgeZone = (ComfortZoneMin - CurrentPitch) / (ComfortZoneMin - MinPitch);
+		}
+
+		PitchInputScale = FMath::Lerp(0.3f, 0.8f, DistanceIntoEdgeZone);
+	}
+
+	AddYawInput(LookAxisVector.X);
+	AddPitchInput(LookAxisVector.Y * PitchInputScale);
+
+	CurrentRotation = GetControlRotation();
+	CurrentPitch = FRotator::NormalizeAxis(CurrentRotation.Pitch);
+	if (CurrentPitch > MaxPitch || CurrentPitch < MinPitch)
+	{
+		CurrentRotation.Pitch = FMath::Clamp(CurrentPitch, MinPitch, MaxPitch);
+		SetControlRotation(CurrentRotation);
+	}
 }
 
 void AMinibonkPlayerController::StartJump()
