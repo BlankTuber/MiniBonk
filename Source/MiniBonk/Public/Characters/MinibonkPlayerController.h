@@ -8,6 +8,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
+// Handles all player input and camera control
 UCLASS()
 class MINIBONK_API AMinibonkPlayerController : public APlayerController
 {
@@ -17,6 +18,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+	// Enhanced Input assets
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
@@ -30,6 +32,7 @@ protected:
 	TObjectPtr<UInputAction> LookAction;
 
 private:
+	// Input callbacks
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void StartJump();

@@ -8,8 +8,10 @@ void AMinibonkPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Set initial camera angle
 	SetControlRotation(FRotator(-25.f, 0.f, 0.f));
 
+	// Add Enhanced Input mapping context
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		if (ensure(DefaultMappingContext))
@@ -29,6 +31,7 @@ void AMinibonkPlayerController::SetupInputComponent()
 		return;
 	}
 
+	// Bind input actions
 	if (ensure(MoveAction))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMinibonkPlayerController::Move);
@@ -56,6 +59,7 @@ void AMinibonkPlayerController::Move(const FInputActionValue& Value)
 
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
+	// Calculate camera-relative movement directions
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -73,11 +77,13 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	FRotator CurrentRotation = GetControlRotation();
 	float CurrentPitch = FRotator::NormalizeAxis(CurrentRotation.Pitch);
 
+	// Pitch limits
 	const float MinPitch = -75.f;
 	const float MaxPitch = 75.f;
 	const float ComfortZoneMin = -40.f;
 	const float ComfortZoneMax = 40.f;
 
+	// Slower pitch input in comfort zone for better control
 	float PitchInputScale = 1.f;
 
 	if (CurrentPitch > ComfortZoneMin && CurrentPitch < ComfortZoneMax)
@@ -86,6 +92,7 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	}
 	else
 	{
+		// Scale up input as we approach limits
 		float DistanceIntoEdgeZone = 0.f;
 
 		if (CurrentPitch >= ComfortZoneMax)
@@ -103,6 +110,7 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	AddYawInput(LookAxisVector.X);
 	AddPitchInput(LookAxisVector.Y * PitchInputScale);
 
+	// Hard clamp pitch to prevent camera flip
 	CurrentRotation = GetControlRotation();
 	CurrentPitch = FRotator::NormalizeAxis(CurrentRotation.Pitch);
 	if (CurrentPitch > MaxPitch || CurrentPitch < MinPitch)

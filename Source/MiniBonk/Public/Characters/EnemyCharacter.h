@@ -8,6 +8,7 @@ class UHealthComponent;
 class USphereComponent;
 class APlayerCharacter;
 
+// Basic enemy that chases and damages player on contact
 UCLASS()
 class MINIBONK_API AEnemyCharacter : public ACharacter
 {
@@ -19,6 +20,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UHealthComponent> HealthComponent;
 
+	// Collision sphere for dealing damage to player
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<USphereComponent> DamageSphere;
 
@@ -32,11 +34,12 @@ protected:
 	float DamageCooldown = 1.f;
 
 private:
+	// Overlap callbacks
 	UFUNCTION()
 	void OnDamageSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-	void OnDamageSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void OnDamageSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	FTimerHandle DamageTimerHandle;
 	TWeakObjectPtr<APlayerCharacter> OverlappingPlayer;

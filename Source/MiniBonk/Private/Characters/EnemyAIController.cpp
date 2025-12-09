@@ -15,6 +15,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 	TimeSinceLastPathUpdate += DeltaTime;
 
+	// Update path at regular intervals instead of every frame
 	if (TimeSinceLastPathUpdate >= PathUpdateInterval)
 	{
 		UpdatePathToPlayer();

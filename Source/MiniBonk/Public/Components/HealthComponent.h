@@ -4,11 +4,12 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+// Events for health changes
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedSignature, float, CurrentHealth, float, MaxHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathSignature);
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+// Reusable health system for any actor
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MINIBONK_API UHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -16,6 +17,7 @@ class MINIBONK_API UHealthComponent : public UActorComponent
 public:
 	UHealthComponent();
 
+	// Events
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 	FOnHealthChangedSignature OnHealthChanged;
 
@@ -24,7 +26,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
-
 
 protected:
 	virtual void BeginPlay() override;

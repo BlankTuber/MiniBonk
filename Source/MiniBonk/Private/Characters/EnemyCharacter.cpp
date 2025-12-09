@@ -9,13 +9,16 @@ AEnemyCharacter::AEnemyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	// Movement setup
 	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
 	MovementComp->MaxWalkSpeed = 450.f;
 	MovementComp->bOrientRotationToMovement = true;
 	MovementComp->RotationRate = FRotator(0.f, 540.f, 0.f);
 
+	// Health component
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
+	// Damage sphere - triggers when player gets close
 	DamageSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DamageSphere"));
 	DamageSphere->SetupAttachment(RootComponent);
 	DamageSphere->SetSphereRadius(100.f);
@@ -28,12 +31,14 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Bind overlap events
 	if (ensure(DamageSphere))
 	{
 		DamageSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnDamageSphereBeginOverlap);
 		DamageSphere->OnComponentEndOverlap.AddDynamic(this, &AEnemyCharacter::OnDamageSphereEndOverlap);
 	}
 
+	// Don't block camera
 	UCapsuleComponent* Capsule = GetCapsuleComponent();
 	if (Capsule)
 	{
@@ -58,8 +63,10 @@ void AEnemyCharacter::OnDamageSphereBeginOverlap(UPrimitiveComponent* Overlapped
 
 	OverlappingPlayer = Player;
 
+	// Deal damage immediately
 	DealDamageToPlayer();
 
+	// Start repeating damage timer
 	GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &AEnemyCharacter::DealDamageToPlayer, DamageCooldown, true);
 }
 
@@ -72,6 +79,7 @@ void AEnemyCharacter::OnDamageSphereEndOverlap(UPrimitiveComponent* OverlappedCo
 		return;
 	}
 
+	// Stop damaging when player leaves range
 	OverlappingPlayer = nullptr;
 	GetWorldTimerManager().ClearTimer(DamageTimerHandle);
 }

@@ -13,6 +13,7 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Initialize health
 	CurrentHealth = MaxHealth;
 	bIsDead = false;
 
@@ -35,6 +36,7 @@ void UHealthComponent::TakeDamage(float DamageAmount)
 
 	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
 
+	// Check for death
 	if (CurrentHealth <= 0.f)
 	{
 		bIsDead = true;
@@ -90,6 +92,7 @@ void UHealthComponent::SetMaxHealth(float NewMaxHealth, bool bHealToFull)
 	}
 	else
 	{
+		// Maintain health percentage
 		float HealthPrecent = (OldMaxHealth > 0.f) ? (CurrentHealth / OldMaxHealth) : 1.f;
 		CurrentHealth = MaxHealth * HealthPrecent;
 	}
