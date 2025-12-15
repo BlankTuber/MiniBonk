@@ -75,8 +75,8 @@ void UAbilityManagerComponent::CollectCard(const FGeneratedCard& Card)
 
 void UAbilityManagerComponent::ApplyPassiveCard(const FGeneratedCard& Card)
 {
-	OnPassiveCardApplied.Broadcast(Card.AffectsAbility, Card.Value);
-	UE_LOG(LogTemp, Log, TEXT("AbilityManager: Passive card applied - %s: %f"), *Card.AffectsAbility.ToString(), Card.Value);
+	OnPassiveCardApplied.Broadcast(Card.AffectsAbility, Card.ModifierType, Card.Value);
+	UE_LOG(LogTemp, Log, TEXT("AbilityManager: Passive card applied - %s: %f (%s)"), *Card.AffectsAbility.ToString(), Card.Value, Card.ModifierType == EModifierType::Flat ? TEXT("Flat") : TEXT("Percentage"));
 }
 
 void UAbilityManagerComponent::StoreActiveCard(const FGeneratedCard& Card)

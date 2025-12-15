@@ -5,7 +5,7 @@
 #include "Systems/AbilityTypes.h"
 #include "AbilityManagerComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPassiveCardApplied, FName, AbilityID, float, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnPassiveCardApplied, FName, AbilityID, EModifierType, ModifierType, float, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnActiveCardCollected, FName, AbilityID, EModifierType, ModifierType, float, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUnlockAcquired, FName, UnlockID);
 
