@@ -4,6 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AIController.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -17,6 +18,7 @@ AEnemyCharacter::AEnemyCharacter()
 
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->OnDeath.AddDynamic(this, &AEnemyCharacter::HandleDeath);
 
 	// Damage sphere - triggers when player gets close
 	DamageSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DamageSphere"));
@@ -99,4 +101,19 @@ void AEnemyCharacter::DealDamageToPlayer()
 	}
 
 	PlayerHealth->TakeDamage(ContactDamage);
+}
+
+void AEnemyCharacter::HandleDeath()
+{
+	// TODO: Spawn coins/XP at death location (when economy system exists)
+	// TODO: Grant XP to player (when progression system exists)
+	// TODO: Notify spawner of death (when spawner system exists)
+
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (ensure(AIController))
+	{
+		AIController->StopMovement();
+	}
+	Destroy();
+	Destroy();
 }

@@ -62,7 +62,7 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 - [X] Basic camera movement
 - [ ] Speed/jump modifiers
 - [X] Health component
-- [ ] Take damage / death
+- [X] Take damage / death
 - [ ] Auto-attack (timer, melee, projectile)
 - [ ] Attack stat modifiers (speed, damage, range)
 
@@ -70,7 +70,7 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 - [X] Base enemy class
 - [X] AI chase behavior
 - [X] Health component
-- [ ] Take damage / death
+- [X] Take damage / death
 - [ ] Coin drops on death
 - [ ] Enemy variant (different stats)
 - [ ] Mini-boss (ranged attack)

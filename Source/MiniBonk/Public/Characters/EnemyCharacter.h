@@ -45,4 +45,7 @@ private:
 	TWeakObjectPtr<APlayerCharacter> OverlappingPlayer;
 
 	void DealDamageToPlayer();
+
+	UFUNCTION()
+	void HandleDeath();
 };

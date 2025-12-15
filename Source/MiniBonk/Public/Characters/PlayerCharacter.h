@@ -27,4 +27,8 @@ public:
 	// Health system
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UHealthComponent> HealthComponent;
+
+private:
+	UFUNCTION()
+	void HandleDeath();
 };

@@ -3,6 +3,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/HealthComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -44,4 +45,15 @@ APlayerCharacter::APlayerCharacter()
 
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
+}
+
+void APlayerCharacter::HandleDeath()
+{
+	// TODO: Disable all abilities/attacks (when attack system exists)
+	// TODO: Show Game Over UI with stats (when UI system exists)
+	// TODO: Stop coin/XP collection (when economy system exists)
+	// TODO: Save run statistics (when save system exists)
+
+	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()));
 }
