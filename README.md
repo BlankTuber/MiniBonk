@@ -60,7 +60,7 @@ Auto-attack roguelite where the player navigates a 3D arena while enemies spawn 
 ### Player System
 - [X] Basic movement
 - [X] Basic camera movement
-- [ ] Speed/jump modifiers
+- [X] Speed/jump modifiers
 - [X] Health component
 - [X] Take damage / death
 - [ ] Auto-attack (timer, melee, projectile)

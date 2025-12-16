@@ -3,7 +3,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/HealthComponent.h"
+#include "Components/MovementStatsComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Systems/AbilityManagerComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -46,6 +48,25 @@ APlayerCharacter::APlayerCharacter()
 	// Health component
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->OnDeath.AddDynamic(this, &APlayerCharacter::HandleDeath);
+
+	// Movement Stats Component
+	MovementStatsComponent = CreateDefaultSubobject<UMovementStatsComponent>(TEXT("MovementStatsComponent"));
+
+	UAbilityManagerComponent* AbilityManager = FindComponentByClass<UAbilityManagerComponent>();
+	if (AbilityManager)
+	{
+		// Bind HealthComponent
+		if (HealthComponent)
+		{
+			AbilityManager->OnPassiveCardApplied.AddDynamic(HealthComponent, &UHealthComponent::OnPassiveCardApplied);
+		}
+
+		// Bind MovementStatsComponent
+		if (MovementStatsComponent)
+		{
+			AbilityManager->OnPassiveCardApplied.AddDynamic(MovementStatsComponent, &UMovementStatsComponent::OnPassiveCardApplied);
+		}
+	}
 }
 
 void APlayerCharacter::HandleDeath()

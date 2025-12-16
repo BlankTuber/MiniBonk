@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Systems/AbilityTypes.h"
 #include "HealthComponent.generated.h"
 
 // Events for health changes
@@ -51,4 +52,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void SetMaxHealth(float NewMaxHealth, bool bHealToFull = true);
+
+	UFUNCTION()
+	void OnPassiveCardApplied(FName AbilityID, EModifierType ModifierType, float Value);
 };

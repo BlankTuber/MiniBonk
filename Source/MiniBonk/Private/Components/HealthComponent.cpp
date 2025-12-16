@@ -1,4 +1,5 @@
 #include "Components/HealthComponent.h"
+#include "Systems/AbilityTypes.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -98,4 +99,27 @@ void UHealthComponent::SetMaxHealth(float NewMaxHealth, bool bHealToFull)
 	}
 
 	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
+}
+
+void UHealthComponent::OnPassiveCardApplied(FName AbilityID, EModifierType ModifierType, float Value)
+{
+	if (AbilityID != "MaxHealth")
+	{
+		return;
+	}
+
+	float NewMaxHealth = MaxHealth;
+
+	if (ModifierType == EModifierType::Flat)
+	{
+		NewMaxHealth += Value;
+	}
+	else if (ModifierType == EModifierType::Percentage)
+	{
+		NewMaxHealth *= (1.f + Value);
+	}
+	
+	SetMaxHealth(NewMaxHealth, true);
+
+	UE_LOG(LogTemp, Log, TEXT("HealthComponent: MaxHealth upgraded to %f (%s)"), NewMaxHealth, ModifierType == EModifierType::Flat ? TEXT("Flat") : TEXT("Percentage"));
 }
