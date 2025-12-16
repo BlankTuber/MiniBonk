@@ -2,6 +2,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "Systems/AbilityManagerComponent.h"
+#include "Systems/AbilityMath.h"
 
 UMovementStatsComponent::UMovementStatsComponent()
 {
@@ -53,21 +54,11 @@ void UMovementStatsComponent::OnPassiveCardApplied(FName AbilityID, EModifierTyp
 			return;
 		}
 
-		if (ModifierType == EModifierType::Flat)
-		{
-			CurrentMoveSpeed += Value;
-		}
-		else if (ModifierType == EModifierType::Percentage)
-		{
-			CurrentMoveSpeed *= (1.f + Value);
-		}
-
-		CurrentMoveSpeed = FMath::Min(CurrentMoveSpeed, MaxMoveSpeed);
+		CurrentMoveSpeed = AbilityMath::ApplyModifier(CurrentMoveSpeed, ModifierType, Value, MaxMoveSpeed);
 		bStatsChanged = true;
 
-		UE_LOG(LogTemp, Log, TEXT("MovementStatsComponent: MoveSpeed upgraded to %f (%s) [Cap: %f]"), CurrentMoveSpeed, ModifierType == EModifierType::Flat ? TEXT("Flat") : TEXT("Percentage"), MaxMoveSpeed);
+		UE_LOG(LogTemp, Log, TEXT("MovementStatsComponent: MoveSpeed upgraded to %f [Cap: %f]"), CurrentMoveSpeed, MaxMoveSpeed);
 
-		// Notify manager if limit has been reached
 		if (CurrentMoveSpeed >= MaxMoveSpeed && AbilityManager)
 		{
 			AbilityManager->NotifyLimitReached("MoveSpeed");
@@ -81,21 +72,11 @@ void UMovementStatsComponent::OnPassiveCardApplied(FName AbilityID, EModifierTyp
 			return;
 		}
 
-		if (ModifierType == EModifierType::Flat)
-		{
-			CurrentJumpHeight += Value;
-		}
-		else if (ModifierType == EModifierType::Percentage)
-		{
-			CurrentJumpHeight *= (1.f + Value);
-		}
-
-		CurrentJumpHeight = FMath::Min(CurrentJumpHeight, MaxJumpHeight);
+		CurrentJumpHeight = AbilityMath::ApplyModifier(CurrentJumpHeight, ModifierType, Value, MaxJumpHeight);
 		bStatsChanged = true;
 
-		UE_LOG(LogTemp, Log, TEXT("MovementStatsComponent: JumpHeight upgraded to %f (%s) [Cap: %f]"), CurrentJumpHeight, ModifierType == EModifierType::Flat ? TEXT("Flat") : TEXT("Percentage"), MaxJumpHeight);
+		UE_LOG(LogTemp, Log, TEXT("MovementStatsComponent: JumpHeight upgraded to %f [Cap: %f]"), CurrentJumpHeight, MaxJumpHeight);
 
-		// Notify manager if limit has been reached
 		if (CurrentJumpHeight >= MaxJumpHeight && AbilityManager)
 		{
 			AbilityManager->NotifyLimitReached("JumpHeight");

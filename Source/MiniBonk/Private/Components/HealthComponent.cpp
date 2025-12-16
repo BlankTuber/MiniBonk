@@ -1,5 +1,6 @@
 #include "Components/HealthComponent.h"
 #include "Systems/AbilityTypes.h"
+#include "Systems/AbilityMath.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -108,18 +109,8 @@ void UHealthComponent::OnPassiveCardApplied(FName AbilityID, EModifierType Modif
 		return;
 	}
 
-	float NewMaxHealth = MaxHealth;
-
-	if (ModifierType == EModifierType::Flat)
-	{
-		NewMaxHealth += Value;
-	}
-	else if (ModifierType == EModifierType::Percentage)
-	{
-		NewMaxHealth *= (1.f + Value);
-	}
-	
+	float NewMaxHealth = AbilityMath::ApplyModifier(MaxHealth, ModifierType, Value);
 	SetMaxHealth(NewMaxHealth, true);
 
-	UE_LOG(LogTemp, Log, TEXT("HealthComponent: MaxHealth upgraded to %f (%s)"), NewMaxHealth, ModifierType == EModifierType::Flat ? TEXT("Flat") : TEXT("Percentage"));
+	UE_LOG(LogTemp, Log, TEXT("HealthComponent: MaxHealth upgraded to %f"), NewMaxHealth);
 }

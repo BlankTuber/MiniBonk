@@ -52,22 +52,30 @@ APlayerCharacter::APlayerCharacter()
 	// Movement Stats Component
 	MovementStatsComponent = CreateDefaultSubobject<UMovementStatsComponent>(TEXT("MovementStatsComponent"));
 
-	UAbilityManagerComponent* AbilityManager = FindComponentByClass<UAbilityManagerComponent>();
-	if (AbilityManager)
+	// Ability Manager Component
+	AbilityManagerComponent = CreateDefaultSubobject<UAbilityManagerComponent>(TEXT("AbilityManagerComponent"));
+}
+
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (AbilityManagerComponent)
 	{
-		// Bind HealthComponent
 		if (HealthComponent)
 		{
-			AbilityManager->OnPassiveCardApplied.AddDynamic(HealthComponent, &UHealthComponent::OnPassiveCardApplied);
+			AbilityManagerComponent->OnPassiveCardApplied.AddDynamic(
+				HealthComponent, &UHealthComponent::OnPassiveCardApplied);
 		}
 
-		// Bind MovementStatsComponent
 		if (MovementStatsComponent)
 		{
-			AbilityManager->OnPassiveCardApplied.AddDynamic(MovementStatsComponent, &UMovementStatsComponent::OnPassiveCardApplied);
+			AbilityManagerComponent->OnPassiveCardApplied.AddDynamic(
+				MovementStatsComponent, &UMovementStatsComponent::OnPassiveCardApplied);
 		}
 	}
 }
+
 
 void APlayerCharacter::HandleDeath()
 {

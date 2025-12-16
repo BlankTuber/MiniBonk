@@ -132,7 +132,19 @@ FGeneratedCard UAbilityCardLibrary::ScaleCardTemplate(const FAbilityCard* Templa
 	Generated.ModifierType = Template->ModifierType;
 
 	// Scale value
-	Generated.Value = Template->BaseValue + (Template->ScalingPerLevel * PlayerLevel);
+	float BaseScaleValue = Template->BaseValue + (Template->ScalingPerLevel * PlayerLevel);
+	float VarianceRange = 0.2f;
+	float VarianceMultiplier = FMath::FRandRange(1.f - VarianceRange, 1.f + VarianceRange);
+
+	if (Template->ModifierType == EModifierType::Flat)
+	{
+		Generated.Value = FMath::RoundToFloat(BaseScaleValue * VarianceMultiplier);
+	}
+	else
+	{
+		Generated.Value = FMath::RoundToFloat(BaseScaleValue * VarianceMultiplier * 100.f) / 100.f;
+	}
+
 
 	// Apply rare boost for non-curse cards
 	if (bIsRare && !Template->bIsCurse)

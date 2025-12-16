@@ -8,6 +8,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UHealthComponent;
 class UMovementStatsComponent;
+class UAbilityManagerComponent;
 
 // Player's physical body - handles camera setup and movement properties
 UCLASS()
@@ -32,6 +33,14 @@ public:
 	// Movement Stats System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UMovementStatsComponent> MovementStatsComponent;
+
+	// Ability Manager System
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
+	TObjectPtr<UAbilityManagerComponent> AbilityManagerComponent;
+
+protected:
+	virtual void BeginPlay() override;
+
 
 private:
 	UFUNCTION()
