@@ -1,212 +1,241 @@
 # MiniBonk
 
-A survivor-like roguelite prototype built in Unreal Engine 5.7 with C++ as a learning project.
+A third-person roguelite prototype built in Unreal Engine 5.7 with C++ as a learning project.
 
-**Engine:** UE 5.7 | **Language:** C++ | **IDE:** Visual Studio | **VCS:** GitHub
+**Engine:** UE 5.7 | **Language:** C++ | **IDE:** Visual Studio
 
 ---
 
 ## Game Overview
 
-Auto-attack roguelite where the player navigates a 3D arena while enemies spawn in waves. Collect coins, level up, choose upgrades, survive.
+Third-person action roguelite where you fight waves of enemies, collect upgrades, and survive as long as possible. Unlike traditional top-down survivors, this uses standard third-person controls with camera-relative movement.
 
 **Core Loop:**
-1. Enemies spawn and chase player
-2. Player auto-attacks nearby enemies
-3. Enemies drop coins on death
-4. Collect coins → level up → choose upgrade
-5. Difficulty scales over time
-6. Survive until death (or optional boss defeat)
+1. Enemies spawn and chase the player
+2. Player attacks enemies (auto-attack + unlockable abilities)
+3. Enemies drop coins/XP on death
+4. Collect enough → Level up → Choose upgrade card
+5. Difficulty scales over time (hybrid system)
+6. Survive until death
+
+**Scaling Philosophy:**
+- Player power scales via card upgrades (level-based)
+- Enemy difficulty scales over time (time-based)
+- Rare cards provide catch-up mechanic for struggling players
 
 ---
 
-## MVP Scope
+## Architecture
 
-### Player
-- Third-person movement (speed/jump modifiable)
-- Health system (damage, death, upgradeable)
-- Auto-attack (projectile + melee slash)
+### Input & Control
+```
+PlayerController (AMinibonkPlayerController)
+├── Adds Input Mapping Context
+├── Binds all input actions
+├── Handles Move/Jump/Look callbacks
+└── Controls the pawn
 
-### Enemies
-- 2 enemy types (basic chaser + variant)
-- 1 mini-boss (ranged attacks)
-- Chase AI, health, death, coin drops
-- Contact damage with cooldown
+Character (APlayerCharacter)
+├── Camera setup (boom + follow camera)
+├── Movement component configuration
+├── Components (Health, Movement Stats, Abilities)
+└── Physical body only - NO input logic
+```
 
-### Systems
-- **Spawning:** Distance-based probability, time-scaling difficulty
-- **Economy:** Coin pickups, upgradeable pickup radius
-- **Progression:** Level-up thresholds, upgrade wheel (3 options), stackable upgrades
-- **Interactables:** Chests (cost coins → random upgrade), power-ups (heal, speed, mega-coin)
+### Component-Based Systems
+The game uses reusable components that can be attached to any actor:
 
-### World
-- Single arena map with boundary walls
-- Nav mesh coverage
+| Component | Purpose |
+|-----------|---------|
+| `HealthComponent` | Health, damage, death events |
+| `MovementStatsComponent` | Speed/jump with caps and upgrades |
+| `AbilityManagerComponent` | Tracks unlocks, limits, applies cards |
 
-### UI
-- Health bar, coin counter, XP bar
-- Upgrade selection screen
-- Game over screen
+### Ability Card System
+```
+DataTable (DT_AbilityCards)
+    ↓
+AbilityCardLibrary (generates scaled cards with variance)
+    ↓
+AbilityManagerComponent (applies cards, broadcasts to components)
+    ↓
+Components listen and modify their stats
+```
+
+**Card Types:**
+- **Upgrade** - Stackable stat boosts (damage, speed, health)
+- **Unlock** - One-time abilities (can be locked by curse cards)
+
+**Modifier Types:**
+- **Flat** - Adds fixed value (+50 health)
+- **Percentage** - Multiplies current value (+10% speed)
+
+**Rare System:**
+- Progressive chance: starts at 0.5%, increases by 0.1% per card until rare, then drops
+- Rare cards are either boosted buffs (2-3x value) or curse cards
+- Acts as catch-up mechanic
 
 ---
 
-## Checklist
+## Project Structure
 
-### Setup
-- [x] Project created
-- [x] Public/Private folder structure
-- [X] GitHub repo initialized
+```
+Source/MiniBonk/
+├── Public/
+│   ├── Characters/
+│   │   ├── PlayerCharacter.h
+│   │   ├── MinibonkPlayerController.h
+│   │   ├── EnemyCharacter.h
+│   │   └── EnemyAIController.h
+│   ├── Components/
+│   │   ├── HealthComponent.h
+│   │   └── MovementStatsComponent.h
+│   └── Systems/
+│       ├── AbilityTypes.h
+│       ├── AbilityMath.h
+│       ├── AbilityManagerComponent.h
+│       ├── AbilityCardLibrary.h
+│       └── AbilityTestSubsystem.h
+└── Private/
+    └── (mirrors Public)
 
-### Player System
-- [X] Basic movement
-- [X] Basic camera movement
-- [X] Speed/jump modifiers
-- [X] Health component
-- [X] Take damage / death
-- [ ] Auto-attack (timer, melee, projectile)
-- [ ] Attack stat modifiers (speed, damage, range)
+Content/
+├── Data/
+│   └── DT_AbilityCards (DataTable)
+├── Blueprints/
+│   ├── BP_Player
+│   ├── BP_Enemy
+│   └── BP_GameMode
+└── Input/
+    ├── IA_Move, IA_Jump, IA_Look
+    └── IMC_Default
+```
 
-### Enemy System
-- [X] Base enemy class
-- [X] AI chase behavior
-- [X] Health component
-- [X] Take damage / death
-- [ ] Coin drops on death
-- [ ] Enemy variant (different stats)
-- [ ] Mini-boss (ranged attack)
-- [ ] Contact damage with cooldown
+---
 
-### Spawning
-- [ ] Spawn manager
-- [ ] Distance-based spawn logic
-- [ ] Time-based difficulty scaling
-- [ ] Weighted enemy selection
-- [ ] Mini-boss trigger
+## Progress
 
-### Economy & Progression
-- [ ] Coin actor + collection
-- [ ] Coin counter
-- [ ] Level-up threshold (scaling)
-- [ ] Upgrade selection UI
-- [ ] Apply upgrades to player
-- [ ] Pickup radius (base + upgradeable)
+### Completed
+- [x] Project setup with Public/Private structure
+- [x] Third-person movement (camera-relative)
+- [x] Mouse camera control with pitch limits
+- [x] Health component (damage, healing, death events)
+- [x] Movement stats component (speed, jump with caps)
+- [x] Basic enemy with chase AI
+- [x] Enemy contact damage with cooldown
+- [x] Death handling (player restarts, enemy destroys)
+- [x] Ability card system (DataTable, generation, application)
+- [x] Progressive rare card chance
+- [x] Flat and percentage modifiers
+- [x] Console commands for testing cards
 
-### Interactables
-- [ ] Chest actor (interaction, cost, reward)
-- [ ] Power-up drops (heal, speed, mega-coin)
+### Next Up
+- [ ] Auto-attack (projectile component)
+- [ ] Melee attack (slash component)
+- [ ] Coin drops on enemy death
+- [ ] XP/level-up system
+- [ ] Enemy spawner with time-based scaling
+- [ ] Card selection UI
 
-### World & UI
-- [ ] Arena with boundaries
-- [ ] Nav mesh
-- [ ] HUD (health, coins, XP)
-- [ ] Upgrade wheel
+### Future
+- [ ] More enemy types
+- [ ] Boss enemies
+- [ ] Interactables (chests, power-ups)
+- [ ] HUD (health bar, coin counter, XP bar)
 - [ ] Game over screen
-
-### Game State
-- [ ] Playing / paused / game over states
-- [ ] Death detection → game over
-- [ ] Restart option
-
-### Polish (Secondary)
-- [ ] Audio (hits, death, coins, music)
-- [ ] VFX (particles, screen shake, damage numbers)
-- [ ] Start menu
-- [ ] Persistent currency / permanent upgrades
+- [ ] Audio and VFX
 
 ---
 
-## Quick Reference
+## Testing
+
+### Console Commands
+Open console with `~` (or F1 if remapped) or use Output Log command field:
+
+```
+Ability.Stats       - Show current player stats
+Ability.Generate    - Generate 3 random upgrade cards
+Ability.Cards       - Show current card choices
+Ability.Select 0    - Pick card at index (0, 1, or 2)
+```
+
+---
+
+## Code Reference
 
 ### Naming Conventions
 
 **C++ Classes**
 | Type | Prefix | Example |
 |------|--------|---------|
-| Actor | A | `AEnemyBase` |
+| Actor | A | `AEnemyCharacter` |
 | UObject / Component | U | `UHealthComponent` |
-| Struct | F | `FDamageInfo` |
-| Enum | E | `EGameState` |
+| Struct | F | `FGeneratedCard` |
+| Enum | E | `EModifierType` |
 | Interface | I | `IDamageable` |
-| Bool variable | b | `bIsAlive` |
+| Bool variable | b | `bIsDead` |
+
+**Project Naming**
+- Module: `MINIBONK_API`
+- Project-specific classes: prefix with `Minibonk` (e.g., `AMinibonkPlayerController`)
+- Generic/reusable classes: no prefix (e.g., `APlayerCharacter`, `UHealthComponent`)
 
 **Content Assets**
 | Type | Prefix | Example |
 |------|--------|---------|
 | Blueprint | BP_ | `BP_Enemy` |
-| Static Mesh | SM_ | `SM_Coin` |
-| Skeletal Mesh | SK_ | `SK_Player` |
+| Data Table | DT_ | `DT_AbilityCards` |
+| Input Action | IA_ | `IA_Move` |
+| Input Mapping Context | IMC_ | `IMC_Default` |
 | Material | M_ | `M_Ground` |
-| Material Instance | MI_ | `MI_Ground_Wet` |
-| Texture | T_ | `T_Rock_D` (diffuse), `T_Rock_N` (normal) |
-| Animation | A_ | `A_Run` |
-| Anim Blueprint | ABP_ | `ABP_Player` |
-| Anim Montage | AM_ | `AM_Attack` |
-| Particle System | PS_ | `PS_Explosion` |
-| Sound | A_ | `A_Hit`, `A_Hit_Cue` |
-| Widget | WBP_ | `WBP_HUD` |
-| Data Table | DT_ | `DT_Enemies` |
+| Texture | T_ | `T_Rock_D` |
 
----
+### Code Standards
 
-**Include Order:**
-1. `#pragma once`
-2. `CoreMinimal.h`
-3. Engine headers
-4. Project headers
-5. `.generated.h` (must be last)
-
-**Forward Declarations:** Use in headers when you only need pointers/references. Include the actual header in the .cpp file.
-
----
-
-### UPROPERTY
-
-| Specifier | Use Case |
-|-----------|----------|
-| `EditDefaultsOnly` | Tweakable in BP defaults only |
-| `EditAnywhere` | Tweakable everywhere |
-| `VisibleAnywhere` | Read-only display |
-| `BlueprintReadOnly` | BP can read |
-| `BlueprintReadWrite` | BP can read/write |
-
----
-
-### Debugging
-
-**Assertions**
 ```cpp
-// Non-fatal: logs error, continues execution
-ensure(Pointer != nullptr);
-ensureMsgf(Value > 0, TEXT("Expected positive value, got %d"), Value);
+// Pointers in UPROPERTY
+UPROPERTY()
+TObjectPtr<UHealthComponent> HealthComponent;
 
-// Fatal in dev builds: halts execution
-check(Pointer != nullptr);
-checkf(Index >= 0, TEXT("Invalid index: %d"), Index);
-```
-
-**Logging**
-```cpp
-UE_LOG(LogTemp, Warning, TEXT("Health: %f"), CurrentHealth);
-UE_LOG(LogTemp, Error, TEXT("Actor is null!"));
-
-// On-screen
-if (GEngine)
+// Validation - logs error but continues
+if (ensure(Pointer))
 {
-    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Debug"));
+    // Use pointer
 }
+
+// Categories on everything
+UPROPERTY(EditDefaultsOnly, Category = "Combat")
+float Damage = 10.f;
+
+// No empty overrides - delete if only calling Super
 ```
 
----
+### Common Patterns
 
-### Common Includes
+**Delegate binding (dynamic):**
+```cpp
+// In BeginPlay, not constructor
+HealthComponent->OnDeath.AddDynamic(this, &AMyActor::HandleDeath);
+
+// Function must be UFUNCTION()
+UFUNCTION()
+void HandleDeath();
+```
+
+**Applying modifiers:**
+```cpp
+#include "Systems/AbilityMath.h"
+
+// Applies flat or percentage, rounds result, respects cap
+CurrentSpeed = AbilityMath::ApplyModifier(CurrentSpeed, ModifierType, Value, MaxSpeed);
+```
+
+### Useful Includes
 
 ```cpp
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "TimerManager.h"
-#include "DrawDebugHelpers.h"
-#include "Components/SphereComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"      // GetPlayerCharacter, etc.
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/SphereComponent.h"
+#include "TimerManager.h"
+#include "Engine/DataTable.h"
 ```
