@@ -4,6 +4,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/MovementStatsComponent.h"
+#include "Components/StoneThrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Systems/AbilityManagerComponent.h"
 
@@ -54,6 +55,9 @@ APlayerCharacter::APlayerCharacter()
 
 	// Ability Manager Component
 	AbilityManagerComponent = CreateDefaultSubobject<UAbilityManagerComponent>(TEXT("AbilityManagerComponent"));
+
+	// Stone Throw Component
+	StoneThrowComponent = CreateDefaultSubobject<UStoneThrowComponent>(TEXT("StoneThrowComponent"));
 }
 
 void APlayerCharacter::BeginPlay()

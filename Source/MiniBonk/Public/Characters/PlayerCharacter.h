@@ -9,6 +9,7 @@ class UCameraComponent;
 class UHealthComponent;
 class UMovementStatsComponent;
 class UAbilityManagerComponent;
+class UStoneThrowComponent;
 
 // Player's physical body - handles camera setup and movement properties
 UCLASS()
@@ -37,6 +38,10 @@ public:
 	// Ability Manager System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TObjectPtr<UAbilityManagerComponent> AbilityManagerComponent;
+
+	// Stone Throw Ability
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UStoneThrowComponent> StoneThrowComponent;
 
 protected:
 	virtual void BeginPlay() override;

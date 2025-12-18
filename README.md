@@ -77,42 +77,6 @@ Components listen and modify their stats
 
 ---
 
-## Project Structure
-
-```
-Source/MiniBonk/
-├── Public/
-│   ├── Characters/
-│   │   ├── PlayerCharacter.h
-│   │   ├── MinibonkPlayerController.h
-│   │   ├── EnemyCharacter.h
-│   │   └── EnemyAIController.h
-│   ├── Components/
-│   │   ├── HealthComponent.h
-│   │   └── MovementStatsComponent.h
-│   └── Systems/
-│       ├── AbilityTypes.h
-│       ├── AbilityMath.h
-│       ├── AbilityManagerComponent.h
-│       ├── AbilityCardLibrary.h
-│       └── AbilityTestSubsystem.h
-└── Private/
-    └── (mirrors Public)
-
-Content/
-├── Data/
-│   └── DT_AbilityCards (DataTable)
-├── Blueprints/
-│   ├── BP_Player
-│   ├── BP_Enemy
-│   └── BP_GameMode
-└── Input/
-    ├── IA_Move, IA_Jump, IA_Look
-    └── IMC_Default
-```
-
----
-
 ## Progress
 
 ### Completed
@@ -130,8 +94,9 @@ Content/
 - [x] Console commands for testing cards
 
 ### Next Up
-- [ ] Auto-attack (projectile component)
+- [X] Auto-attack (projectile component)
 - [ ] Melee attack (slash component)
+- [ ] Activated attack (dash component)
 - [ ] Coin drops on enemy death
 - [ ] XP/level-up system
 - [ ] Enemy spawner with time-based scaling
