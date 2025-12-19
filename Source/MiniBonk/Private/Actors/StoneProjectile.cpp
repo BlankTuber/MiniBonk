@@ -17,8 +17,6 @@ AStoneProjectile::AStoneProjectile()
 	RootComponent = CollisionComponent;
 
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComponent"));
-	MovementComponent->InitialSpeed = Speed;
-	MovementComponent->MaxSpeed = Speed;
 	MovementComponent->bRotationFollowsVelocity = true;
 	MovementComponent->bShouldBounce = false;
 	MovementComponent->ProjectileGravityScale = 0.f;
@@ -40,13 +38,15 @@ void AStoneProjectile::BeginPlay()
 	CollisionComponent->OnComponentHit.AddDynamic(this, &AStoneProjectile::OnHit);
 }
 
-void AStoneProjectile::InitializeProjectile(float InDamage, const FVector& Direction)
+void AStoneProjectile::InitializeProjectile(float InDamage, const FVector& Direction, float InSpeed)
 {
 	Damage = InDamage;
 
 	if (ensure(MovementComponent))
 	{
-		MovementComponent->Velocity = Direction.GetSafeNormal() * Speed;
+		MovementComponent->InitialSpeed = InSpeed;
+		MovementComponent->MaxSpeed = InSpeed;
+		MovementComponent->Velocity = Direction.GetSafeNormal() * InSpeed;
 		MovementComponent->Activate();
 	}
 }

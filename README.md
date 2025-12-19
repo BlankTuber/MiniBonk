@@ -99,7 +99,7 @@ Components listen and modify their stats
 - [ ] Activated attack (dash component)
 - [ ] Coin drops on enemy death
 - [ ] XP/level-up system
-- [ ] Enemy spawner with time-based scaling
+- [X] Enemy spawner with time-based scaling
 - [ ] Card selection UI
 
 ### Future

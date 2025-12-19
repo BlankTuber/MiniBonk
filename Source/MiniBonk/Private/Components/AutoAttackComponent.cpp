@@ -11,9 +11,7 @@ UAutoAttackComponent::UAutoAttackComponent()
 	CurrentDamage = BaseDamage;
 	CurrentCooldown = BaseCooldown;
 	CurrentRange = BaseRange;
-
 }
-
 
 void UAutoAttackComponent::BeginPlay()
 {
@@ -58,9 +56,9 @@ TArray<AActor*> UAutoAttackComponent::FindTargets() const
 	}
 
 	EnemiesInRange.Sort([](const TPair<float, AActor*>& A, const TPair<float, AActor*>& B)
-	{
-		return A.Key < B.Key;
-	});
+		{
+			return A.Key < B.Key;
+		});
 
 	int32 NumToReturn = FMath::Min(TargetCount, EnemiesInRange.Num());
 	for (int32 i = 0; i < NumToReturn; ++i)
@@ -82,6 +80,12 @@ void UAutoAttackComponent::StartAttackTimer()
 	);
 }
 
+void UAutoAttackComponent::RestartAttackTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(AttackTimerHandle);
+	StartAttackTimer();
+}
+
 void UAutoAttackComponent::OnAttackTimerExpired()
 {
 	TArray<AActor*> Targets = FindTargets();
@@ -96,12 +100,9 @@ void UAutoAttackComponent::OnAttackTimerExpired()
 
 void UAutoAttackComponent::OnPassiveCardApplied(FName CardAbilityID, EModifierType ModifierType, float Value)
 {
-	if (CardAbilityID != AbilityID)
+	if (CardAbilityID == DamageAbilityID)
 	{
-		return;
+		CurrentDamage = AbilityMath::ApplyModifier(CurrentDamage, ModifierType, Value);
+		UE_LOG(LogTemp, Log, TEXT("%s: Damage upgraded to %.1f"), *GetName(), CurrentDamage);
 	}
-
-	CurrentDamage = AbilityMath::ApplyModifier(CurrentDamage, ModifierType, Value);
-
-	UE_LOG(LogTemp, Log, TEXT("AutoAttackComponent %s: Damage upgraded to %f"), *AbilityID.ToString(), CurrentDamage);
 }

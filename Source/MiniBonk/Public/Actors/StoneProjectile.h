@@ -11,11 +11,11 @@ UCLASS()
 class MINIBONK_API AStoneProjectile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	AStoneProjectile();
 
-	void InitializeProjectile(float InDamage, const FVector& Direction);
+	void InitializeProjectile(float InDamage, const FVector& Direction, float InSpeed);
 
 protected:
 	virtual void BeginPlay() override;
@@ -25,9 +25,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> MovementComponent;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	float Speed = 2000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	float Lifespan = 3.f;

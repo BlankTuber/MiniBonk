@@ -5,10 +5,14 @@
 #include "Characters/PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
+#include "Characters/EnemyAIController.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	AIControllerClass = AEnemyAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	// Movement setup
 	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
