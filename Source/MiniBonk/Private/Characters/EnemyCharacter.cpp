@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
 #include "Characters/EnemyAIController.h"
+#include "Actors/Coin.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -109,15 +110,33 @@ void AEnemyCharacter::DealDamageToPlayer()
 
 void AEnemyCharacter::HandleDeath()
 {
-	// TODO: Spawn coins/XP at death location (when economy system exists)
-	// TODO: Grant XP to player (when progression system exists)
-	// TODO: Notify spawner of death (when spawner system exists)
+	// Spawn coins
+	if (CoinClass)
+	{
+		int32 CoinCount = FMath::RandRange(MinCoinDrop, MaxCoinDrop);
+		FVector SpawnLocation = GetActorLocation();
+
+		for (int32 i = 0; i < CoinCount; ++i)
+		{
+			// Slight random offset so coins don't stack perfectly
+			FVector Offset = FVector(
+				FMath::RandRange(-50.f, 50.f),
+				FMath::RandRange(-50.f, 50.f),
+				50.f
+			);
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			GetWorld()->SpawnActor<ACoin>(CoinClass, SpawnLocation + Offset, FRotator::ZeroRotator, SpawnParams);
+		}
+	}
 
 	AAIController* AIController = Cast<AAIController>(GetController());
 	if (ensure(AIController))
 	{
 		AIController->StopMovement();
 	}
-	Destroy();
+
 	Destroy();
 }

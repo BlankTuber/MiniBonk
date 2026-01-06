@@ -97,7 +97,7 @@ Components listen and modify their stats
 - [X] Auto-attack (projectile component)
 - [ ] Melee attack (slash component)
 - [ ] Activated attack (dash component)
-- [ ] Coin drops on enemy death
+- [X] Coin drops on enemy death
 - [ ] XP/level-up system
 - [X] Enemy spawner with time-based scaling
 - [ ] Card selection UI

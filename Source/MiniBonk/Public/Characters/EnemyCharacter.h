@@ -7,6 +7,7 @@
 class UHealthComponent;
 class USphereComponent;
 class APlayerCharacter;
+class ACoin;
 
 // Basic enemy that chases and damages player on contact
 UCLASS()
@@ -32,6 +33,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	float DamageCooldown = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Loot")
+	TSubclassOf<ACoin> CoinClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Loot")
+	int32 MinCoinDrop = 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Loot")
+	int32 MaxCoinDrop = 3;
 
 private:
 	// Overlap callbacks

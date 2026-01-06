@@ -9,6 +9,7 @@
 #include "Engine/DataTable.h"
 #include "Kismet/GameplayStatics.h"
 #include "HAL/IConsoleManager.h"
+#include "Components/CoinComponent.h"
 
 void UAbilityTestSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -201,6 +202,13 @@ void UAbilityTestSubsystem::ShowStats()
     {
         UE_LOG(LogTemp, Log, TEXT("Move Speed: %.0f"), MoveComp->MaxWalkSpeed);
         UE_LOG(LogTemp, Log, TEXT("Jump Height: %.0f"), MoveComp->JumpZVelocity);
+    }
+
+    // Coins
+    if (Player->CoinComponent)
+    {
+        UE_LOG(LogTemp, Log, TEXT("Coins: %d"), Player->CoinComponent->GetCurrentCoins());
+        UE_LOG(LogTemp, Log, TEXT("Magnet Radius: %.0f"), Player->CoinComponent->GetMagnetRadius());
     }
 
     UE_LOG(LogTemp, Log, TEXT("=================================="));

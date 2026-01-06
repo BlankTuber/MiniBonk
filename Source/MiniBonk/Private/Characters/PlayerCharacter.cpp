@@ -7,6 +7,7 @@
 #include "Components/StoneThrowComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Systems/AbilityManagerComponent.h"
+#include "Components/CoinComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -58,6 +59,9 @@ APlayerCharacter::APlayerCharacter()
 
 	// Stone Throw Component
 	StoneThrowComponent = CreateDefaultSubobject<UStoneThrowComponent>(TEXT("StoneThrowComponent"));
+
+	// Coin Component
+	CoinComponent = CreateDefaultSubobject<UCoinComponent>(TEXT("CoinComponent"));
 }
 
 void APlayerCharacter::BeginPlay()

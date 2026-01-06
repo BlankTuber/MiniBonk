@@ -10,6 +10,7 @@ class UHealthComponent;
 class UMovementStatsComponent;
 class UAbilityManagerComponent;
 class UStoneThrowComponent;
+class UCoinComponent;
 
 // Player's physical body - handles camera setup and movement properties
 UCLASS()
@@ -42,6 +43,10 @@ public:
 	// Stone Throw Ability
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UStoneThrowComponent> StoneThrowComponent;
+
+	// Coin Collection System
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Economy")
+	TObjectPtr<UCoinComponent> CoinComponent;
 
 protected:
 	virtual void BeginPlay() override;
