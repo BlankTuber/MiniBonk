@@ -11,6 +11,7 @@ class UMovementStatsComponent;
 class UAbilityManagerComponent;
 class UStoneThrowComponent;
 class UCoinComponent;
+class ULevelComponent;
 
 // Player's physical body - handles camera setup and movement properties
 UCLASS()
@@ -47,6 +48,10 @@ public:
 	// Coin Collection System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Economy")
 	TObjectPtr<UCoinComponent> CoinComponent;
+
+	// Level/XP System
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Progression")
+	TObjectPtr<ULevelComponent> LevelComponent;
 
 protected:
 	virtual void BeginPlay() override;

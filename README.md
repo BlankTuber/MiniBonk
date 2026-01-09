@@ -50,6 +50,8 @@ The game uses reusable components that can be attached to any actor:
 | `HealthComponent` | Health, damage, death events |
 | `MovementStatsComponent` | Speed/jump with caps and upgrades |
 | `AbilityManagerComponent` | Tracks unlocks, limits, applies cards |
+| `LevelComponent` | XP tracking, level ups, pauses for card selection |
+| `CoinComponent` | Coin collection, magnet radius |
 
 ### Ability Card System
 ```
@@ -75,6 +77,14 @@ Components listen and modify their stats
 - Rare cards are either boosted buffs (2-3x value) or curse cards
 - Acts as catch-up mechanic
 
+**Scaling Systems:**
+- **XP per coin:** `CoinValue * XPPerCoin * (1.005 ^ ElapsedSeconds)`
+- **XP to level:** `5 * (1.4 ^ (Level - 1))` - exponential growth
+- **Coin value:** `1 + (ElapsedMinutes * 1.0)` - linear growth
+- **Enemy HP:** `BaseHP * (1.003 ^ ElapsedSeconds)` - exponential growth
+- **Enemy Damage:** `BaseDamage * (1 + ElapsedMinutes * 0.2)` - linear growth
+- **Spawn Rate:** Interval decreases over time (see EnemySpawnerComponent)
+
 ---
 
 ## Progress
@@ -92,21 +102,22 @@ Components listen and modify their stats
 - [x] Progressive rare card chance
 - [x] Flat and percentage modifiers
 - [x] Console commands for testing cards
+- [x] Auto-attack (projectile component)
+- [x] Coin drops on enemy death
+- [x] Enemy spawner with time-based scaling
+- [x] XP/level-up system
+- [x] Enemy HP/damage scaling over time
 
 ### Next Up
-- [X] Auto-attack (projectile component)
+- [ ] Card selection UI (hook into OnLevelUp)
 - [ ] Melee attack (slash component)
 - [ ] Activated attack (dash component)
-- [X] Coin drops on enemy death
-- [ ] XP/level-up system
-- [X] Enemy spawner with time-based scaling
-- [ ] Card selection UI
+- [ ] HUD (health bar, coin counter, XP bar)
 
 ### Future
 - [ ] More enemy types
 - [ ] Boss enemies
 - [ ] Interactables (chests, power-ups)
-- [ ] HUD (health bar, coin counter, XP bar)
 - [ ] Game over screen
 - [ ] Audio and VFX
 

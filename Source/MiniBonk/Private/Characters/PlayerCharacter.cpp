@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Systems/AbilityManagerComponent.h"
 #include "Components/CoinComponent.h"
+#include "Components/LevelComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -62,6 +63,9 @@ APlayerCharacter::APlayerCharacter()
 
 	// Coin Component
 	CoinComponent = CreateDefaultSubobject<UCoinComponent>(TEXT("CoinComponent"));
+
+	// Level Component
+	LevelComponent = CreateDefaultSubobject<ULevelComponent>(TEXT("LevelComponent"));
 }
 
 void APlayerCharacter::BeginPlay()

@@ -43,6 +43,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Loot")
 	int32 MaxCoinDrop = 3;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Scaling")
+	float HPGrowthPerSecond = 0.003f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Scaling")
+	float DamageGrowthPerMinute = 0.2f;
+
 private:
 	// Overlap callbacks
 	UFUNCTION()

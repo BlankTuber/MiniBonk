@@ -57,6 +57,25 @@ void AEnemyCharacter::BeginPlay()
 	{
 		MeshComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	}
+
+	// Scale stats based on elapsed time
+	float ElapsedSeconds = GetWorld()->GetTimeSeconds();
+	float ElapsedMinutes = ElapsedSeconds / 60.f;
+
+	// HP scales exponentially per second
+	float HPMultiplier = FMath::Pow(1.f + HPGrowthPerSecond, ElapsedSeconds);
+	if (HealthComponent)
+	{
+		HealthComponent->SetMaxHealth(HealthComponent->MaxHealth * HPMultiplier, true);
+		UE_LOG(LogTemp, Verbose, TEXT("Enemy spawned: HP %.0f (%.2fx at %.0fs)"),
+			HealthComponent->MaxHealth, HPMultiplier, ElapsedSeconds);
+	}
+
+	// Damage scales linearly per minute
+	float DamageMultiplier = 1.f + (ElapsedMinutes * DamageGrowthPerMinute);
+	ContactDamage = ContactDamage * DamageMultiplier;
+	UE_LOG(LogTemp, Verbose, TEXT("Enemy spawned: Damage %.1f (%.2fx at %.1f min)"),
+		ContactDamage, DamageMultiplier, ElapsedMinutes);
 }
 
 void AEnemyCharacter::OnDamageSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

@@ -42,7 +42,7 @@ protected:
 	int32 DefaultValue = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Coin")
-	float ValueScalePerMinute = 0.5f;
+	float ValueScalePerMinute = 1.37f;
 
 private:
 	int32 Value = 1;

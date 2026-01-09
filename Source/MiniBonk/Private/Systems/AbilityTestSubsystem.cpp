@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "HAL/IConsoleManager.h"
 #include "Components/CoinComponent.h"
+#include "Components/LevelComponent.h"
 
 void UAbilityTestSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -56,6 +57,19 @@ void UAbilityTestSubsystem::RegisterConsoleCommands()
     ShowStatsCommand = IConsoleManager::Get().RegisterConsoleCommand(TEXT("Ability.Stats"), TEXT("Show current player stats"), FConsoleCommandDelegate::CreateUObject(this, &UAbilityTestSubsystem::ShowStats), ECVF_Default);
 
     ShowCardsCommand = IConsoleManager::Get().RegisterConsoleCommand(TEXT("Ability.Cards"), TEXT("Show currently available cards"), FConsoleCommandDelegate::CreateUObject(this, &UAbilityTestSubsystem::ShowCards), ECVF_Default);
+
+    UnpauseCommand = IConsoleManager::Get().RegisterConsoleCommand(TEXT("Ability.Unpause"), TEXT("Unpause the game (use after card selection or to skip)"),
+        FConsoleCommandDelegate::CreateLambda([this]()
+            {
+                UWorld* World = GetGameInstance()->GetWorld();
+                if (World)
+                {
+                    UGameplayStatics::SetGamePaused(World, false);
+                    UE_LOG(LogTemp, Log, TEXT("Game unpaused."));
+                }
+            }),
+        ECVF_Default
+    );
 }
 
 void UAbilityTestSubsystem::UnregisterConsoleCommands()
@@ -75,6 +89,10 @@ void UAbilityTestSubsystem::UnregisterConsoleCommands()
     if (ShowCardsCommand)
     {
         IConsoleManager::Get().UnregisterConsoleObject(ShowCardsCommand);
+    }
+    if (UnpauseCommand)
+    {
+        IConsoleManager::Get().UnregisterConsoleObject(UnpauseCommand);
     }
 }
 
@@ -170,6 +188,9 @@ void UAbilityTestSubsystem::SelectCard(int32 Index)
     CurrentCardChoices.Empty();
 
     UE_LOG(LogTemp, Log, TEXT("Card applied! Use 'Ability.Stats' to see changes."));
+
+    // Unpause game after card selection
+    UGameplayStatics::SetGamePaused(World, false);
 }
 
 void UAbilityTestSubsystem::ShowStats()
@@ -209,6 +230,16 @@ void UAbilityTestSubsystem::ShowStats()
     {
         UE_LOG(LogTemp, Log, TEXT("Coins: %d"), Player->CoinComponent->GetCurrentCoins());
         UE_LOG(LogTemp, Log, TEXT("Magnet Radius: %.0f"), Player->CoinComponent->GetMagnetRadius());
+    }
+
+    // Level
+    if (Player->LevelComponent)
+    {
+        UE_LOG(LogTemp, Log, TEXT("Level: %d"), Player->LevelComponent->GetCurrentLevel());
+        UE_LOG(LogTemp, Log, TEXT("XP: %d / %d (%.0f%%)"),
+            Player->LevelComponent->GetCurrentXP(),
+            Player->LevelComponent->GetXPForNextLevel(),
+            Player->LevelComponent->GetLevelProgressPercent() * 100.f);
     }
 
     UE_LOG(LogTemp, Log, TEXT("=================================="));

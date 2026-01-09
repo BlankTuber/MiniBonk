@@ -40,4 +40,5 @@ private:
 	IConsoleObject* SelectCardCommand = nullptr;
 	IConsoleObject* ShowStatsCommand = nullptr;
 	IConsoleObject* ShowCardsCommand = nullptr;
+	IConsoleObject* UnpauseCommand = nullptr;
 };
