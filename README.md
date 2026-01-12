@@ -33,6 +33,7 @@ PlayerController (AMinibonkPlayerController)
 ├── Adds Input Mapping Context
 ├── Binds all input actions
 ├── Handles Move/Jump/Look callbacks
+├── Creates and manages HUD widget
 └── Controls the pawn
 
 Character (APlayerCharacter)
@@ -52,6 +53,26 @@ The game uses reusable components that can be attached to any actor:
 | `AbilityManagerComponent` | Tracks unlocks, limits, applies cards |
 | `LevelComponent` | XP tracking, level ups, pauses for card selection |
 | `CoinComponent` | Coin collection, magnet radius |
+
+### UI System
+```
+MinibonkPlayerController
+    ↓ creates
+MinibonkHUD (WBP_MinibonkHUD)
+├── Manages all UI elements
+├── Holds reference to CardDataTable
+├── Listens to LevelComponent::OnLevelUp
+└── Contains:
+    └── CardSelectionWidget (WBP_CardSelection)
+        ├── 3 card buttons with name/description/value
+        ├── Broadcasts OnCardSelected when clicked
+        └── C++ handles logic, Blueprint handles layout
+```
+
+**UI Pattern:**
+- C++ base classes (`UUserWidget` subclasses) define logic and `BindWidget` references
+- Blueprint widgets derive from C++ and handle visual layout/styling
+- `meta = (BindWidget)` connects Blueprint UI elements to C++ variables by name
 
 ### Ability Card System
 ```
@@ -107,9 +128,10 @@ Components listen and modify their stats
 - [x] Enemy spawner with time-based scaling
 - [x] XP/level-up system
 - [x] Enemy HP/damage scaling over time
+- [x] Card selection UI (functional, needs polish)
 
 ### Next Up
-- [ ] Card selection UI (hook into OnLevelUp)
+- [ ] Polish card selection UI (styling, title, better layout)
 - [ ] Melee attack (slash component)
 - [ ] Activated attack (dash component)
 - [ ] HUD (health bar, coin counter, XP bar)
@@ -133,6 +155,7 @@ Ability.Stats       - Show current player stats
 Ability.Generate    - Generate 3 random upgrade cards
 Ability.Cards       - Show current card choices
 Ability.Select 0    - Pick card at index (0, 1, or 2)
+Ability.Unpause     - Unpause game (if stuck)
 ```
 
 ---
@@ -146,6 +169,7 @@ Ability.Select 0    - Pick card at index (0, 1, or 2)
 |------|--------|---------|
 | Actor | A | `AEnemyCharacter` |
 | UObject / Component | U | `UHealthComponent` |
+| Widget | U | `UCardSelectionWidget` |
 | Struct | F | `FGeneratedCard` |
 | Enum | E | `EModifierType` |
 | Interface | I | `IDamageable` |
@@ -153,13 +177,14 @@ Ability.Select 0    - Pick card at index (0, 1, or 2)
 
 **Project Naming**
 - Module: `MINIBONK_API`
-- Project-specific classes: prefix with `Minibonk` (e.g., `AMinibonkPlayerController`)
+- Project-specific classes: prefix with `Minibonk` (e.g., `AMinibonkPlayerController`, `UMinibonkHUD`)
 - Generic/reusable classes: no prefix (e.g., `APlayerCharacter`, `UHealthComponent`)
 
 **Content Assets**
 | Type | Prefix | Example |
 |------|--------|---------|
 | Blueprint | BP_ | `BP_Enemy` |
+| Widget Blueprint | WBP_ | `WBP_CardSelection` |
 | Data Table | DT_ | `DT_AbilityCards` |
 | Input Action | IA_ | `IA_Move` |
 | Input Mapping Context | IMC_ | `IMC_Default` |
@@ -172,6 +197,10 @@ Ability.Select 0    - Pick card at index (0, 1, or 2)
 // Pointers in UPROPERTY
 UPROPERTY()
 TObjectPtr<UHealthComponent> HealthComponent;
+
+// Widget binding - Blueprint must have widget with matching name
+UPROPERTY(meta = (BindWidget))
+TObjectPtr<UButton> Card0Button;
 
 // Validation - logs error but continues
 if (ensure(Pointer))
@@ -206,6 +235,13 @@ void HandleDeath();
 CurrentSpeed = AbilityMath::ApplyModifier(CurrentSpeed, ModifierType, Value, MaxSpeed);
 ```
 
+**Creating UMG widgets in C++:**
+```cpp
+// In PlayerController or similar
+HUDWidget = CreateWidget<UMinibonkHUD>(this, HUDWidgetClass);
+HUDWidget->AddToViewport();
+```
+
 ### Useful Includes
 
 ```cpp
@@ -214,4 +250,7 @@ CurrentSpeed = AbilityMath::ApplyModifier(CurrentSpeed, ModifierType, Value, Max
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
 #include "Engine/DataTable.h"
+#include "Blueprint/UserWidget.h"        // For UMG widgets
+#include "Components/Button.h"           // UMG Button
+#include "Components/TextBlock.h"        // UMG TextBlock
 ```

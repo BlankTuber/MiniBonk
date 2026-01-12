@@ -7,6 +7,7 @@
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class UMinibonkHUD;
 
 // Handles all player input and camera control
 UCLASS()
@@ -31,10 +32,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
 
+	// HUD widget class to spawn
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UMinibonkHUD> HUDWidgetClass;
+
+	// Active HUD widget instance
+	UPROPERTY()
+	TObjectPtr<UMinibonkHUD> HUDWidget;
+
 private:
 	// Input callbacks
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void StartJump();
 	void StopJump();
+
+	void CreateHUD();
 };

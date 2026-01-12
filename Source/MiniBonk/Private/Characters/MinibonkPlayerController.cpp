@@ -3,6 +3,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "UI/MinibonkHUD.h"
+#include "Characters/PlayerCharacter.h"
+#include "Systems/AbilityManagerComponent.h"
+#include "Components/LevelComponent.h"
 
 void AMinibonkPlayerController::BeginPlay()
 {
@@ -17,6 +21,45 @@ void AMinibonkPlayerController::BeginPlay()
 		if (ensure(DefaultMappingContext))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+	// Create and initialize the HUD
+	CreateHUD();
+}
+
+void AMinibonkPlayerController::CreateHUD()
+{
+	if (!HUDWidgetClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MinibonkPlayerController: No HUDWidgetClass set"));
+		return;
+	}
+
+	HUDWidget = CreateWidget<UMinibonkHUD>(this, HUDWidgetClass);
+	if (!HUDWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("MinibonkPlayerController: Failed to create HUD widget"));
+		return;
+	}
+
+	HUDWidget->AddToViewport();
+
+	// Get the player character and connect systems
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetPawn());
+	if (PlayerChar)
+	{
+		// Initialize HUD with ability manager
+		if (PlayerChar->AbilityManagerComponent)
+		{
+			HUDWidget->InitializeHUD(PlayerChar->AbilityManagerComponent);
+		}
+
+		// Bind to level up event
+		if (PlayerChar->LevelComponent)
+		{
+			PlayerChar->LevelComponent->OnLevelUp.AddDynamic(HUDWidget, &UMinibonkHUD::OnLevelUp);
+			UE_LOG(LogTemp, Log, TEXT("MinibonkPlayerController: HUD connected to LevelComponent"));
 		}
 	}
 }
