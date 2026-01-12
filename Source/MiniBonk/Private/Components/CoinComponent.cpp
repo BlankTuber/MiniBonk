@@ -1,4 +1,5 @@
 #include "Components/CoinComponent.h"
+#include "Systems/AbilityMath.h"
 
 UCoinComponent::UCoinComponent()
 {
@@ -29,6 +30,25 @@ void UCoinComponent::AddCoins(int32 Amount)
 
 void UCoinComponent::SetMagnetRadius(float NewRadius)
 {
-	MagnetRadius = FMath::Max(0.f, NewRadius);
+	MagnetRadius = FMath::Clamp(NewRadius, 0.f, MaxMagnetRadius);
 	UE_LOG(LogTemp, Log, TEXT("CoinComponent: Magnet radius set to %.0f"), MagnetRadius);
+}
+
+void UCoinComponent::OnPassiveCardApplied(FName AbilityID, EModifierType ModifierType, float Value)
+{
+	if (AbilityID != "MagnetRadius")
+	{
+		return;
+	}
+
+	if (MagnetRadius >= MaxMagnetRadius)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CoinComponent: MagnetRadius already at max (%.0f)"), MaxMagnetRadius);
+		return;
+	}
+
+	float NewRadius = AbilityMath::ApplyModifier(MagnetRadius, ModifierType, Value, MaxMagnetRadius);
+	SetMagnetRadius(NewRadius);
+
+	UE_LOG(LogTemp, Log, TEXT("CoinComponent: MagnetRadius upgraded to %.0f [Max: %.0f]"), MagnetRadius, MaxMagnetRadius);
 }

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Systems/AbilityTypes.h"
 #include "CoinComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCoinsChangedSignature, int32, CurrentCoins, int32, Delta);
@@ -29,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Coins")
 	void SetMagnetRadius(float NewRadius);
 
+	UFUNCTION()
+	void OnPassiveCardApplied(FName AbilityID, EModifierType ModifierType, float Value);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -40,4 +44,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Coins|Magnet")
 	float MagnetRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Coins|Magnet|Limits")
+	float MaxMagnetRadius = 800.f;
 };

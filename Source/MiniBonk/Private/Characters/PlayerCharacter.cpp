@@ -85,6 +85,12 @@ void APlayerCharacter::BeginPlay()
 			AbilityManagerComponent->OnPassiveCardApplied.AddDynamic(
 				MovementStatsComponent, &UMovementStatsComponent::OnPassiveCardApplied);
 		}
+
+		if (CoinComponent)
+		{
+			AbilityManagerComponent->OnPassiveCardApplied.AddDynamic(
+				CoinComponent, &UCoinComponent::OnPassiveCardApplied);
+		}
 	}
 }
 
