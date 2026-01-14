@@ -89,10 +89,12 @@ void AEnemyCharacter::OnDamageSphereBeginOverlap(UPrimitiveComponent* Overlapped
 
 	OverlappingPlayer = Player;
 
-	// Deal damage immediately
-	DealDamageToPlayer();
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (CurrentTime - LastDamageTime >= DamageCooldown)
+	{
+		DealDamageToPlayer();
+	}
 
-	// Start repeating damage timer
 	GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &AEnemyCharacter::DealDamageToPlayer, DamageCooldown, true);
 }
 
@@ -118,6 +120,12 @@ void AEnemyCharacter::DealDamageToPlayer()
 		return;
 	}
 
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (CurrentTime - LastDamageTime < DamageCooldown)
+	{
+		return;
+	}
+
 	UHealthComponent* PlayerHealth = OverlappingPlayer->FindComponentByClass<UHealthComponent>();
 	if (!ensure(PlayerHealth))
 	{
@@ -125,6 +133,7 @@ void AEnemyCharacter::DealDamageToPlayer()
 	}
 
 	PlayerHealth->TakeDamage(ContactDamage);
+	LastDamageTime = CurrentTime;
 }
 
 void AEnemyCharacter::HandleDeath()

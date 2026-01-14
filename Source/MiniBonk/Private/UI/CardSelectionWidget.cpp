@@ -114,3 +114,11 @@ void UCardSelectionWidget::SelectCard(int32 Index)
 
 	OnCardSelected.Broadcast(SelectedCard);
 }
+
+void UCardSelectionWidget::SetTitle(const FText& Title)
+{
+	if (TitleText)
+	{
+		TitleText->SetText(Title);
+	}
+}

@@ -128,13 +128,12 @@ Components listen and modify their stats
 - [x] Enemy spawner with time-based scaling
 - [x] XP/level-up system
 - [x] Enemy HP/damage scaling over time
-- [x] Card selection UI (functional, needs polish)
+- [x] Card selection UI
+- [X] HUD (health bar, coin counter, XP bar)
 
 ### Next Up
-- [ ] Polish card selection UI (styling, title, better layout)
 - [ ] Melee attack (slash component)
 - [ ] Activated attack (dash component)
-- [ ] HUD (health bar, coin counter, XP bar)
 
 ### Future
 - [ ] More enemy types

@@ -8,6 +8,8 @@ class UCardSelectionWidget;
 class UAbilityCardLibrary;
 class UAbilityManagerComponent;
 class UDataTable;
+class UProgressBar;
+class UTextBlock;
 struct FGeneratedCard;
 
 UCLASS()
@@ -20,6 +22,15 @@ public:
 	void InitializeHUD(UAbilityManagerComponent* InAbilityManager);
 
 	UFUNCTION()
+	void UpdateHealth(float CurrentHealth, float MaxHealth);
+
+	UFUNCTION()
+	void UpdateCoins(int32 CurrentCoins, int32 Delta);
+
+	UFUNCTION()
+	void UpdateXP(int32 CurrentXP, int32 XPForNextLevel, int32 CurrentLevel);
+
+	UFUNCTION()
 	void OnLevelUp(int32 NewLevel, int32 XPForNextLevel);
 
 protected:
@@ -28,6 +39,19 @@ protected:
 	// Card selection widget
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCardSelectionWidget> CardSelectionWidget;
+
+	// HUD Elements
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UProgressBar> HealthBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> CoinText;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UProgressBar> XPBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> LevelText;
 
 	// Data table containing card templates
 	UPROPERTY(EditDefaultsOnly, Category = "Cards")

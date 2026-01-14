@@ -44,7 +44,7 @@ protected:
 	int32 MaxCoinDrop = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Scaling")
-	float HPGrowthPerSecond = 0.003f;
+	float HPGrowthPerSecond = 0.0125f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Scaling")
 	float DamageGrowthPerMinute = 0.2f;
@@ -59,6 +59,7 @@ private:
 
 	FTimerHandle DamageTimerHandle;
 	TWeakObjectPtr<APlayerCharacter> OverlappingPlayer;
+	float LastDamageTime = -100.f;
 
 	void DealDamageToPlayer();
 

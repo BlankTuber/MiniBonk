@@ -47,21 +47,53 @@ void AMinibonkPlayerController::CreateHUD()
 
 	// Get the player character and connect systems
 	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetPawn());
-	if (PlayerChar)
+	if (!PlayerChar)
 	{
-		// Initialize HUD with ability manager
-		if (PlayerChar->AbilityManagerComponent)
-		{
-			HUDWidget->InitializeHUD(PlayerChar->AbilityManagerComponent);
-		}
-
-		// Bind to level up event
-		if (PlayerChar->LevelComponent)
-		{
-			PlayerChar->LevelComponent->OnLevelUp.AddDynamic(HUDWidget, &UMinibonkHUD::OnLevelUp);
-			UE_LOG(LogTemp, Log, TEXT("MinibonkPlayerController: HUD connected to LevelComponent"));
-		}
+		return;
 	}
+
+	// Initialize HUD with ability manager
+	if (PlayerChar->AbilityManagerComponent)
+	{
+		HUDWidget->InitializeHUD(PlayerChar->AbilityManagerComponent);
+	}
+
+	// Bind to health changes
+	if (PlayerChar->HealthComponent)
+	{
+		PlayerChar->HealthComponent->OnHealthChanged.AddDynamic(HUDWidget, &UMinibonkHUD::UpdateHealth);
+
+		// Set initial health display
+		HUDWidget->UpdateHealth(
+			PlayerChar->HealthComponent->MaxHealth,
+			PlayerChar->HealthComponent->MaxHealth
+		);
+	}
+
+	// Bind to coin changes
+	if (PlayerChar->CoinComponent)
+	{
+		PlayerChar->CoinComponent->OnCoinsChanged.AddDynamic(HUDWidget, &UMinibonkHUD::UpdateCoins);
+
+		// Set initial coin display
+		HUDWidget->UpdateCoins(PlayerChar->CoinComponent->GetCurrentCoins(), 0);
+	}
+
+	// Bind to level/XP changes
+	if (PlayerChar->LevelComponent)
+	{
+		PlayerChar->LevelComponent->OnLevelUp.AddDynamic(HUDWidget, &UMinibonkHUD::OnLevelUp);
+		PlayerChar->LevelComponent->OnXPChanged.AddDynamic(HUDWidget, &UMinibonkHUD::UpdateXP);
+
+		// Set initial XP display
+		HUDWidget->UpdateXP(
+			PlayerChar->LevelComponent->GetCurrentXP(),
+			PlayerChar->LevelComponent->GetXPForNextLevel(),
+			PlayerChar->LevelComponent->GetCurrentLevel()
+		);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("MinibonkPlayerController: HUD connected to player components"));
 }
 
 void AMinibonkPlayerController::SetupInputComponent()
@@ -151,7 +183,7 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	}
 
 	AddYawInput(LookAxisVector.X);
-	AddPitchInput(LookAxisVector.Y * PitchInputScale);
+	AddPitchInput(-LookAxisVector.Y * PitchInputScale);
 
 	// Hard clamp pitch to prevent camera flip
 	CurrentRotation = GetControlRotation();

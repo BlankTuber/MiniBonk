@@ -4,6 +4,8 @@
 #include "Systems/AbilityManagerComponent.h"
 #include "Systems/AbilityTypes.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 
 void UMinibonkHUD::NativeConstruct()
 {
@@ -103,4 +105,33 @@ void UMinibonkHUD::OnCardSelected(const FGeneratedCard& SelectedCard)
 	}
 
 	HideCardSelection();
+}
+
+void UMinibonkHUD::UpdateHealth(float CurrentHealth, float MaxHealth)
+{
+	if (HealthBar && MaxHealth > 0.f)
+	{
+		HealthBar->SetPercent(CurrentHealth / MaxHealth);
+	}
+}
+
+void UMinibonkHUD::UpdateCoins(int32 CurrentCoins, int32 Delta)
+{
+	if (CoinText)
+	{
+		CoinText->SetText(FText::AsNumber(CurrentCoins));
+	}
+}
+
+void UMinibonkHUD::UpdateXP(int32 CurrentXP, int32 XPForNextLevel, int32 CurrentLevel)
+{
+	if (XPBar && XPForNextLevel > 0)
+	{
+		XPBar->SetPercent(static_cast<float>(CurrentXP) / static_cast<float>(XPForNextLevel));
+	}
+
+	if (LevelText)
+	{
+		LevelText->SetText(FText::Format(INVTEXT("Lv {0}"), CurrentLevel));
+	}
 }

@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Systems/AbilityTypes.h"
+#include "Components/TextBlock.h"
 #include "CardSelectionWidget.generated.h"
 
 class UButton;
@@ -21,6 +22,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Card Selection")
 	FOnCardSelected OnCardSelected;
+
+	UFUNCTION(BlueprintCallable, Category = "Card Selection")
+	void SetTitle(const FText& Title);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -64,6 +68,10 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> Card2Value;
+
+	// Title text
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> TitleText;
 
 private:
 	UPROPERTY()
