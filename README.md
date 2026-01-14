@@ -31,15 +31,15 @@ Third-person action roguelite where you fight waves of enemies, collect upgrades
 ```
 PlayerController (AMinibonkPlayerController)
 ├── Adds Input Mapping Context
-├── Binds all input actions
-├── Handles Move/Jump/Look callbacks
+├── Binds all input actions (Move, Jump, Look, Dash)
+├── Handles Move/Jump/Look/Dash callbacks
 ├── Creates and manages HUD widget
 └── Controls the pawn
 
 Character (APlayerCharacter)
 ├── Camera setup (boom + follow camera)
 ├── Movement component configuration
-├── Components (Health, Movement Stats, Abilities)
+├── Components (Health, Movement Stats, Abilities, Dash)
 └── Physical body only - NO input logic
 ```
 
@@ -53,6 +53,9 @@ The game uses reusable components that can be attached to any actor:
 | `AbilityManagerComponent` | Tracks unlocks, limits, applies cards |
 | `LevelComponent` | XP tracking, level ups, pauses for card selection |
 | `CoinComponent` | Coin collection, magnet radius |
+| `AutoAttackComponent` | Base class for automatic attacks |
+| `StoneThrowComponent` | Projectile auto-attack |
+| `DashComponent` | Player-activated dash attack |
 
 ### UI System
 ```
@@ -88,6 +91,11 @@ Components listen and modify their stats
 **Card Types:**
 - **Upgrade** - Stackable stat boosts (damage, speed, health)
 - **Unlock** - One-time abilities (can be locked by curse cards)
+
+**Ability Types:**
+- **Passive** - Applied immediately when collected (broadcasts `OnPassiveCardApplied`)
+- **Auto** - Same as Passive
+- **Active** - Stored for runtime calculation via `CalculateActiveAbilityValue()`
 
 **Modifier Types:**
 - **Flat** - Adds fixed value (+50 health)
@@ -129,13 +137,16 @@ Components listen and modify their stats
 - [x] XP/level-up system
 - [x] Enemy HP/damage scaling over time
 - [x] Card selection UI
-- [X] HUD (health bar, coin counter, XP bar)
+- [x] HUD (health bar, coin counter, XP bar)
+- [x] Dash attack (activated ability with damage)
 
 ### Next Up
-- [ ] Melee attack (slash component)
-- [ ] Activated attack (dash component)
+- [ ] Audio / sfx
+- [ ] Simple animations
+- [ ] Simple vfx
 
 ### Future
+- [ ] Melee attack (slash component)
 - [ ] More enemy types
 - [ ] Boss enemies
 - [ ] Interactables (chests, power-ups)
@@ -148,7 +159,6 @@ Components listen and modify their stats
 
 ### Console Commands
 Open console with `~` (or F1 if remapped) or use Output Log command field:
-
 ```
 Ability.Stats       - Show current player stats
 Ability.Generate    - Generate 3 random upgrade cards
@@ -190,8 +200,36 @@ Ability.Unpause     - Unpause game (if stuck)
 | Material | M_ | `M_Ground` |
 | Texture | T_ | `T_Rock_D` |
 
-### Code Standards
+**DataTable Row Names (Ability Cards)**
+| Card Type | Pattern | Example |
+|-----------|---------|---------|
+| Flat upgrade | `{AbilityID}_Flat` | `DashDamage_Flat` |
+| Percentage upgrade | `{AbilityID}_Percent` | `DashDamage_Percent` |
+| Curse (flat benefit) | `{AbilityID}_Curse_{CurseTarget}` | `DashDamage_Curse_MaxHealth` |
+| Curse (percent benefit) | `{AbilityID}_CursePercent_{CurseTarget}` | `DashDamage_CursePercent_MaxHealth` |
+| Unlock | `{UnlockID}_Unlock` | `DoubleJump_Unlock` |
 
+### Ability IDs Reference
+
+**Passive Abilities** (apply immediately via `OnPassiveCardApplied`):
+| Ability ID | Component | Effect |
+|------------|-----------|--------|
+| `MaxHealth` | HealthComponent | Increases max health |
+| `MoveSpeed` | MovementStatsComponent | Increases movement speed |
+| `JumpHeight` | MovementStatsComponent | Increases jump velocity |
+| `MagnetRadius` | CoinComponent | Increases coin pickup range |
+| `StoneThrowDamage` | StoneThrowComponent | Increases projectile damage |
+| `StoneThrowCooldown` | StoneThrowComponent | Reduces attack cooldown |
+| `StoneThrowSpeed` | StoneThrowComponent | Increases projectile speed |
+
+**Active Abilities** (calculated at use-time via `CalculateActiveAbilityValue`):
+| Ability ID | Component | Effect |
+|------------|-----------|--------|
+| `DashDamage` | DashComponent | Increases dash attack damage |
+| `DashCooldown` | DashComponent | Reduces dash cooldown |
+| `DashDistance` | DashComponent | Increases dash distance |
+
+### Code Standards
 ```cpp
 // Pointers in UPROPERTY
 UPROPERTY()
@@ -226,12 +264,18 @@ UFUNCTION()
 void HandleDeath();
 ```
 
-**Applying modifiers:**
+**Applying modifiers (Passive abilities):**
 ```cpp
 #include "Systems/AbilityMath.h"
 
 // Applies flat or percentage, rounds result, respects cap
 CurrentSpeed = AbilityMath::ApplyModifier(CurrentSpeed, ModifierType, Value, MaxSpeed);
+```
+
+**Calculating active ability values:**
+```cpp
+// Get value at use-time from AbilityManager
+float Damage = AbilityManager->CalculateActiveAbilityValue(DamageAbilityID, BaseDamage);
 ```
 
 **Creating UMG widgets in C++:**
@@ -242,7 +286,6 @@ HUDWidget->AddToViewport();
 ```
 
 ### Useful Includes
-
 ```cpp
 #include "Kismet/GameplayStatics.h"      // GetPlayerCharacter, etc.
 #include "GameFramework/CharacterMovementComponent.h"

@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> LookAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> DashAction;
+
 	// HUD widget class to spawn
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMinibonkHUD> HUDWidgetClass;
@@ -46,6 +49,10 @@ private:
 	void Look(const FInputActionValue& Value);
 	void StartJump();
 	void StopJump();
+	void Dash();
 
 	void CreateHUD();
+
+	// Cached movement input for dash direction
+	FVector2D LastMovementInput;
 };

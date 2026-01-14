@@ -7,6 +7,7 @@
 #include "Characters/PlayerCharacter.h"
 #include "Systems/AbilityManagerComponent.h"
 #include "Components/LevelComponent.h"
+#include "Components/DashComponent.h"
 
 void AMinibonkPlayerController::BeginPlay()
 {
@@ -122,6 +123,11 @@ void AMinibonkPlayerController::SetupInputComponent()
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AMinibonkPlayerController::StartJump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AMinibonkPlayerController::StopJump);
 	}
+
+	if (ensure(DashAction))
+	{
+		EnhancedInput->BindAction(DashAction, ETriggerEvent::Started, this, &AMinibonkPlayerController::Dash);
+	}
 }
 
 void AMinibonkPlayerController::Move(const FInputActionValue& Value)
@@ -133,6 +139,9 @@ void AMinibonkPlayerController::Move(const FInputActionValue& Value)
 	}
 
 	const FVector2D MovementVector = Value.Get<FVector2D>();
+
+	// Cache for dash direction
+	LastMovementInput = MovementVector;
 
 	// Calculate camera-relative movement directions
 	const FRotator Rotation = GetControlRotation();
@@ -209,4 +218,37 @@ void AMinibonkPlayerController::StopJump()
 	{
 		ControlledCharacter->StopJumping();
 	}
+}
+
+void AMinibonkPlayerController::Dash()
+{
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetPawn());
+	if (!PlayerChar || !PlayerChar->DashComponent)
+	{
+		return;
+	}
+
+	// Calculate dash direction from movement input (camera-relative)
+	FVector DashDirection;
+
+	if (LastMovementInput.IsNearlyZero())
+	{
+		// No movement input - dash forward (camera direction)
+		const FRotator Rotation = GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		DashDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	}
+	else
+	{
+		// Dash in movement direction
+		const FRotator Rotation = GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		DashDirection = (ForwardDirection * LastMovementInput.Y + RightDirection * LastMovementInput.X).GetSafeNormal();
+	}
+
+	PlayerChar->DashComponent->TryDash(DashDirection);
 }

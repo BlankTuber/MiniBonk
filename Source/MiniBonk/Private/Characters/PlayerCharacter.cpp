@@ -5,10 +5,12 @@
 #include "Components/HealthComponent.h"
 #include "Components/MovementStatsComponent.h"
 #include "Components/StoneThrowComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Systems/AbilityManagerComponent.h"
+#include "Components/DashComponent.h"
 #include "Components/CoinComponent.h"
 #include "Components/LevelComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Systems/AbilityManagerComponent.h"
+
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -66,6 +68,9 @@ APlayerCharacter::APlayerCharacter()
 
 	// Level Component
 	LevelComponent = CreateDefaultSubobject<ULevelComponent>(TEXT("LevelComponent"));
+
+	// Dash Component
+	DashComponent = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponent"));
 }
 
 void APlayerCharacter::BeginPlay()
@@ -97,10 +102,5 @@ void APlayerCharacter::BeginPlay()
 
 void APlayerCharacter::HandleDeath()
 {
-	// TODO: Disable all abilities/attacks (when attack system exists)
-	// TODO: Show Game Over UI with stats (when UI system exists)
-	// TODO: Stop coin/XP collection (when economy system exists)
-	// TODO: Save run statistics (when save system exists)
-
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()));
 }

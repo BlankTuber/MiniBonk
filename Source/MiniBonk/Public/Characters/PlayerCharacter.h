@@ -12,6 +12,7 @@ class UAbilityManagerComponent;
 class UStoneThrowComponent;
 class UCoinComponent;
 class ULevelComponent;
+class UDashComponent;
 
 // Player's physical body - handles camera setup and movement properties
 UCLASS()
@@ -52,6 +53,10 @@ public:
 	// Level/XP System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Progression")
 	TObjectPtr<ULevelComponent> LevelComponent;
+
+	// Dash Ability
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UDashComponent> DashComponent;
 
 protected:
 	virtual void BeginPlay() override;
