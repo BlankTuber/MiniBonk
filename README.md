@@ -57,6 +57,36 @@ The game uses reusable components that can be attached to any actor:
 | `StoneThrowComponent` | Projectile auto-attack |
 | `DashComponent` | Player-activated dash attack |
 
+### Animation System
+```
+Animation Blueprints (ABP_)
+├── ABP_Player
+│   ├── Event Graph: Updates Speed and bIsFalling variables
+│   └── Anim Graph: State Machine (Locomotion)
+│       ├── Idle/Move state → BS_Player_Locomotion
+│       └── Jump state → Jump animation
+│
+└── ABP_Enemy
+    ├── Event Graph: Updates Speed variable
+    └── Anim Graph: BS_Enemy_Locomotion (direct, no state machine)
+
+Blend Spaces (BS_)
+├── BS_Player_Locomotion (1D: Speed 0-500)
+│   ├── 0: Idle
+│   ├── 150: Walk
+│   └── 500: Run
+│
+└── BS_Enemy_Locomotion (1D: Speed 0-450)
+    ├── 0: Idle
+    ├── 150: Walk
+    └── 450: Run
+```
+
+**Animation Blueprint Pattern:**
+- Event Graph calculates variables from pawn state (Speed, bIsFalling)
+- Variables are used in Anim Graph for transitions and blend spaces
+- Avoids thread-unsafe calls in transition rules by pre-calculating in Event Graph
+
 ### UI System
 ```
 MinibonkPlayerController
@@ -139,11 +169,13 @@ Components listen and modify their stats
 - [x] Card selection UI
 - [x] HUD (health bar, coin counter, XP bar)
 - [x] Dash attack (activated ability with damage)
+- [x] Player animations (locomotion + jump)
+- [x] Enemy animations (locomotion)
 
 ### Next Up
 - [ ] Audio / sfx
-- [ ] Simple animations
 - [ ] Simple vfx
+- [ ] Death animations (player and enemy)
 
 ### Future
 - [ ] Melee attack (slash component)
@@ -151,7 +183,6 @@ Components listen and modify their stats
 - [ ] Boss enemies
 - [ ] Interactables (chests, power-ups)
 - [ ] Game over screen
-- [ ] Audio and VFX
 
 ---
 
@@ -199,6 +230,8 @@ Ability.Unpause     - Unpause game (if stuck)
 | Input Mapping Context | IMC_ | `IMC_Default` |
 | Material | M_ | `M_Ground` |
 | Texture | T_ | `T_Rock_D` |
+| Animation Blueprint | ABP_ | `ABP_Player` |
+| Blend Space | BS_ | `BS_Player_Locomotion` |
 
 **DataTable Row Names (Ability Cards)**
 | Card Type | Pattern | Example |
@@ -228,6 +261,26 @@ Ability.Unpause     - Unpause game (if stuck)
 | `DashDamage` | DashComponent | Increases dash attack damage |
 | `DashCooldown` | DashComponent | Reduces dash cooldown |
 | `DashDistance` | DashComponent | Increases dash distance |
+
+### Animation Assets Reference
+
+**Player (Male_Casual)**
+| Animation | Usage |
+|-----------|-------|
+| `Male_Casual_..._Idle` | BS_Player_Locomotion at speed 0 |
+| `Male_Casual_..._Walk` | BS_Player_Locomotion at speed 150 |
+| `Male_Casual_..._Run` | BS_Player_Locomotion at speed 500 |
+| `Male_Casual_..._Jump` | Jump state in ABP_Player |
+| `Male_Casual_..._Death` | (Future) Death state |
+| `Male_Casual_..._Punch` | (Future) Attack animation |
+
+**Enemy (Male_Suit)**
+| Animation | Usage |
+|-----------|-------|
+| `Male_Suit_..._Idle` | BS_Enemy_Locomotion at speed 0 |
+| `Male_Suit_..._Walk` | BS_Enemy_Locomotion at speed 150 |
+| `Male_Suit_..._Run` | BS_Enemy_Locomotion at speed 450 |
+| `Male_Suit_..._Death` | (Future) Death state |
 
 ### Code Standards
 ```cpp
