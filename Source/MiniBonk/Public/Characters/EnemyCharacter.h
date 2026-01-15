@@ -8,6 +8,7 @@ class UHealthComponent;
 class USphereComponent;
 class APlayerCharacter;
 class ACoin;
+class UNiagaraSystem;
 
 // Basic enemy that chases and damages player on contact
 UCLASS()
@@ -46,6 +47,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Scaling")
 	float HPGrowthPerSecond = 0.0125f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TObjectPtr<UNiagaraSystem> DamageEffect;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Scaling")
 	float DamageGrowthPerMinute = 0.2f;
 
@@ -65,4 +69,7 @@ private:
 
 	UFUNCTION()
 	void HandleDeath();
+
+	UFUNCTION()
+	void HandleDamageTaken(float DamageAmount, FVector HitLocation);
 };

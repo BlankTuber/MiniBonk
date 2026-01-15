@@ -171,10 +171,10 @@ Components listen and modify their stats
 - [x] Dash attack (activated ability with damage)
 - [x] Player animations (locomotion + jump)
 - [x] Enemy animations (locomotion)
+- [X] Simple vfx
 
 ### Next Up
 - [ ] Audio / sfx
-- [ ] Simple vfx
 - [ ] Death animations (player and enemy)
 
 ### Future

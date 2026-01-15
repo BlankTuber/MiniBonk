@@ -38,6 +38,8 @@ void UHealthComponent::TakeDamage(float DamageAmount)
 
 	OnHealthChanged.Broadcast(CurrentHealth, MaxHealth);
 
+	OnDamageTaken.Broadcast(DamageAmount, GetOwner()->GetActorLocation());
+
 	// Check for death
 	if (CurrentHealth <= 0.f)
 	{

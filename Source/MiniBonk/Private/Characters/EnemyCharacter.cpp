@@ -7,6 +7,7 @@
 #include "AIController.h"
 #include "Characters/EnemyAIController.h"
 #include "Actors/Coin.h"
+#include "NiagaraFunctionLibrary.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -76,6 +77,11 @@ void AEnemyCharacter::BeginPlay()
 	ContactDamage = ContactDamage * DamageMultiplier;
 	UE_LOG(LogTemp, Verbose, TEXT("Enemy spawned: Damage %.1f (%.2fx at %.1f min)"),
 		ContactDamage, DamageMultiplier, ElapsedMinutes);
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDamageTaken.AddDynamic(this, &AEnemyCharacter::HandleDamageTaken);
+	}
 }
 
 void AEnemyCharacter::OnDamageSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -167,4 +173,22 @@ void AEnemyCharacter::HandleDeath()
 	}
 
 	Destroy();
+}
+
+void AEnemyCharacter::HandleDamageTaken(float DamageAmount, FVector HitLocation)
+{
+	if (DamageEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(),
+			DamageEffect,
+			HitLocation,
+			FRotator::ZeroRotator,
+			FVector(1.f),
+			true,
+			true,
+			ENCPoolMethod::None,
+			true
+		);
+	}
 }

@@ -59,7 +59,7 @@ protected:
 	float BaseDamage = 25.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Dash|Stats")
-	float DamageRadius = 100.f;
+	float DamageRadius = 250.f;
 
 	// Limits
 	UPROPERTY(EditDefaultsOnly, Category = "Dash|Limits")
