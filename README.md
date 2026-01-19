@@ -176,13 +176,14 @@ Components listen and modify their stats
 ### Next Up
 - [ ] Audio / sfx
 - [ ] Death animations (player and enemy)
+- [ ] Map
+- [ ] Interactables (chests, power-ups)
+- [ ] Game over screen
 
 ### Future
 - [ ] Melee attack (slash component)
 - [ ] More enemy types
 - [ ] Boss enemies
-- [ ] Interactables (chests, power-ups)
-- [ ] Game over screen
 
 ---
 
