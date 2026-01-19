@@ -15,12 +15,14 @@ Third-person action roguelite where you fight waves of enemies, collect upgrades
 2. Player attacks enemies (auto-attack + unlockable abilities)
 3. Enemies drop coins/XP on death
 4. Collect enough → Level up → Choose upgrade card
-5. Difficulty scales over time (hybrid system)
-6. Survive until death
+5. Find chests → Spend coins → Get additional cards
+6. Difficulty scales over time (hybrid system)
+7. Survive until death
 
 **Scaling Philosophy:**
 - Player power scales via card upgrades (level-based)
 - Enemy difficulty scales over time (time-based)
+- Chest costs scale with player level
 - Rare cards provide catch-up mechanic for struggling players
 
 ---
@@ -31,8 +33,8 @@ Third-person action roguelite where you fight waves of enemies, collect upgrades
 ```
 PlayerController (AMinibonkPlayerController)
 ├── Adds Input Mapping Context
-├── Binds all input actions (Move, Jump, Look, Dash)
-├── Handles Move/Jump/Look/Dash callbacks
+├── Binds all input actions (Move, Jump, Look, Dash, Interact)
+├── Handles Move/Jump/Look/Dash/Interact callbacks
 ├── Creates and manages HUD widget
 └── Controls the pawn
 
@@ -40,6 +42,7 @@ Character (APlayerCharacter)
 ├── Camera setup (boom + follow camera)
 ├── Movement component configuration
 ├── Components (Health, Movement Stats, Abilities, Dash)
+├── CurrentInteractable (tracks nearby interactable actor)
 └── Physical body only - NO input logic
 ```
 
@@ -52,10 +55,28 @@ The game uses reusable components that can be attached to any actor:
 | `MovementStatsComponent` | Speed/jump with caps and upgrades |
 | `AbilityManagerComponent` | Tracks unlocks, limits, applies cards |
 | `LevelComponent` | XP tracking, level ups, pauses for card selection |
-| `CoinComponent` | Coin collection, magnet radius |
+| `CoinComponent` | Coin collection, spending, magnet radius |
 | `AutoAttackComponent` | Base class for automatic attacks |
 | `StoneThrowComponent` | Projectile auto-attack |
 | `DashComponent` | Player-activated dash attack |
+
+### Interactables
+```
+Chest (AChest)
+├── InteractionSphere (detects player proximity)
+├── InteractionLight (visual feedback: green/red based on affordability)
+├── Cost scales with player level: BaseCost * (GrowthRate ^ (Level - 1))
+├── On purchase: deducts coins, triggers card selection
+└── Updates HUD interaction prompt when player nearby
+```
+
+**Interaction Flow:**
+1. Player enters chest's InteractionSphere
+2. Chest registers itself as player's CurrentInteractable
+3. Chest shows HUD prompt and enables light
+4. Chest binds to CoinComponent::OnCoinsChanged to update affordability in real-time
+5. Player presses Interact (E) → PlayerController calls Chest::TryPurchase()
+6. On success: spend coins, pause game, trigger card selection, destroy chest
 
 ### Animation System
 ```
@@ -82,30 +103,31 @@ Blend Spaces (BS_)
     └── 450: Run
 ```
 
-**Animation Blueprint Pattern:**
-- Event Graph calculates variables from pawn state (Speed, bIsFalling)
-- Variables are used in Anim Graph for transitions and blend spaces
-- Avoids thread-unsafe calls in transition rules by pre-calculating in Event Graph
-
 ### UI System
 ```
 MinibonkPlayerController
     ↓ creates
 MinibonkHUD (WBP_MinibonkHUD)
-├── Manages all UI elements
+├── Health bar, coin counter, XP bar, level text
+├── Interaction prompt (shows chest cost, green/red color)
 ├── Holds reference to CardDataTable
 ├── Listens to LevelComponent::OnLevelUp
+├── Exposes TriggerCardSelection(Title) for external triggers (chests)
 └── Contains:
     └── CardSelectionWidget (WBP_CardSelection)
         ├── 3 card buttons with name/description/value
+        ├── Title text (shows "Level Up!" or "Chest Reward")
         ├── Broadcasts OnCardSelected when clicked
         └── C++ handles logic, Blueprint handles layout
 ```
 
-**UI Pattern:**
-- C++ base classes (`UUserWidget` subclasses) define logic and `BindWidget` references
-- Blueprint widgets derive from C++ and handle visual layout/styling
-- `meta = (BindWidget)` connects Blueprint UI elements to C++ variables by name
+**Required Widget Bindings (WBP_MinibonkHUD):**
+- `CardSelectionWidget` - UCardSelectionWidget
+- `HealthBar` - UProgressBar
+- `CoinText` - UTextBlock
+- `XPBar` - UProgressBar
+- `LevelText` - UTextBlock
+- `InteractionPromptText` - UTextBlock
 
 ### Ability Card System
 ```
@@ -140,7 +162,8 @@ Components listen and modify their stats
 - **XP per coin:** `CoinValue * XPPerCoin * (1.005 ^ ElapsedSeconds)`
 - **XP to level:** `5 * (1.4 ^ (Level - 1))` - exponential growth
 - **Coin value:** `1 + (ElapsedMinutes * 1.0)` - linear growth
-- **Enemy HP:** `BaseHP * (1.003 ^ ElapsedSeconds)` - exponential growth
+- **Chest cost:** `25 * (1.3 ^ (Level - 1))` - exponential growth
+- **Enemy HP:** `BaseHP * (1.0125 ^ ElapsedSeconds)` - exponential growth
 - **Enemy Damage:** `BaseDamage * (1 + ElapsedMinutes * 0.2)` - linear growth
 - **Spawn Rate:** Interval decreases over time (see EnemySpawnerComponent)
 
@@ -171,13 +194,14 @@ Components listen and modify their stats
 - [x] Dash attack (activated ability with damage)
 - [x] Player animations (locomotion + jump)
 - [x] Enemy animations (locomotion)
-- [X] Simple vfx
+- [x] Simple vfx
+- [x] Chest interactable (purchase card rolls with coins)
 
 ### Next Up
+- [ ] Chest spawner
 - [ ] Audio / sfx
 - [ ] Death animations (player and enemy)
 - [ ] Map
-- [ ] Interactables (chests, power-ups)
 - [ ] Game over screen
 
 ### Future
@@ -208,7 +232,7 @@ Ability.Unpause     - Unpause game (if stuck)
 **C++ Classes**
 | Type | Prefix | Example |
 |------|--------|---------|
-| Actor | A | `AEnemyCharacter` |
+| Actor | A | `AEnemyCharacter`, `AChest` |
 | UObject / Component | U | `UHealthComponent` |
 | Widget | U | `UCardSelectionWidget` |
 | Struct | F | `FGeneratedCard` |
@@ -219,29 +243,29 @@ Ability.Unpause     - Unpause game (if stuck)
 **Project Naming**
 - Module: `MINIBONK_API`
 - Project-specific classes: prefix with `Minibonk` (e.g., `AMinibonkPlayerController`, `UMinibonkHUD`)
-- Generic/reusable classes: no prefix (e.g., `APlayerCharacter`, `UHealthComponent`)
+- Generic/reusable classes: no prefix (e.g., `APlayerCharacter`, `UHealthComponent`, `AChest`)
 
 **Content Assets**
 | Type | Prefix | Example |
 |------|--------|---------|
-| Blueprint | BP_ | `BP_Enemy` |
+| Blueprint | BP_ | `BP_Enemy`, `BP_Chest` |
 | Widget Blueprint | WBP_ | `WBP_CardSelection` |
 | Data Table | DT_ | `DT_AbilityCards` |
-| Input Action | IA_ | `IA_Move` |
+| Input Action | IA_ | `IA_Move`, `IA_Interact` |
 | Input Mapping Context | IMC_ | `IMC_Default` |
 | Material | M_ | `M_Ground` |
 | Texture | T_ | `T_Rock_D` |
 | Animation Blueprint | ABP_ | `ABP_Player` |
 | Blend Space | BS_ | `BS_Player_Locomotion` |
 
-**DataTable Row Names (Ability Cards)**
-| Card Type | Pattern | Example |
-|-----------|---------|---------|
-| Flat upgrade | `{AbilityID}_Flat` | `DashDamage_Flat` |
-| Percentage upgrade | `{AbilityID}_Percent` | `DashDamage_Percent` |
-| Curse (flat benefit) | `{AbilityID}_Curse_{CurseTarget}` | `DashDamage_Curse_MaxHealth` |
-| Curse (percent benefit) | `{AbilityID}_CursePercent_{CurseTarget}` | `DashDamage_CursePercent_MaxHealth` |
-| Unlock | `{UnlockID}_Unlock` | `DoubleJump_Unlock` |
+### Input Actions Reference
+| Action | Key | Purpose |
+|--------|-----|---------|
+| `IA_Move` | WASD | Movement |
+| `IA_Look` | Mouse | Camera control |
+| `IA_Jump` | Space | Jump |
+| `IA_Dash` | Shift | Dash attack |
+| `IA_Interact` | E | Interact with chests etc. |
 
 ### Ability IDs Reference
 
@@ -262,26 +286,6 @@ Ability.Unpause     - Unpause game (if stuck)
 | `DashDamage` | DashComponent | Increases dash attack damage |
 | `DashCooldown` | DashComponent | Reduces dash cooldown |
 | `DashDistance` | DashComponent | Increases dash distance |
-
-### Animation Assets Reference
-
-**Player (Male_Casual)**
-| Animation | Usage |
-|-----------|-------|
-| `Male_Casual_..._Idle` | BS_Player_Locomotion at speed 0 |
-| `Male_Casual_..._Walk` | BS_Player_Locomotion at speed 150 |
-| `Male_Casual_..._Run` | BS_Player_Locomotion at speed 500 |
-| `Male_Casual_..._Jump` | Jump state in ABP_Player |
-| `Male_Casual_..._Death` | (Future) Death state |
-| `Male_Casual_..._Punch` | (Future) Attack animation |
-
-**Enemy (Male_Suit)**
-| Animation | Usage |
-|-----------|-------|
-| `Male_Suit_..._Idle` | BS_Enemy_Locomotion at speed 0 |
-| `Male_Suit_..._Walk` | BS_Enemy_Locomotion at speed 150 |
-| `Male_Suit_..._Run` | BS_Enemy_Locomotion at speed 450 |
-| `Male_Suit_..._Death` | (Future) Death state |
 
 ### Code Standards
 ```cpp
@@ -332,21 +336,56 @@ CurrentSpeed = AbilityMath::ApplyModifier(CurrentSpeed, ModifierType, Value, Max
 float Damage = AbilityManager->CalculateActiveAbilityValue(DamageAbilityID, BaseDamage);
 ```
 
-**Creating UMG widgets in C++:**
+**Triggering card selection from external source:**
 ```cpp
-// In PlayerController or similar
-HUDWidget = CreateWidget<UMinibonkHUD>(this, HUDWidgetClass);
-HUDWidget->AddToViewport();
+AMinibonkPlayerController* PC = Cast<AMinibonkPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+if (PC)
+{
+    UMinibonkHUD* HUD = PC->GetHUDWidget();
+    if (HUD)
+    {
+        UGameplayStatics::SetGamePaused(GetWorld(), true);
+        HUD->TriggerCardSelection(FText::FromString(TEXT("My Title")));
+    }
+}
+```
+
+**Interaction pattern (for new interactables):**
+```cpp
+// In your interactable actor:
+void AMyInteractable::OnOverlapBegin(...)
+{
+    APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+    if (Player)
+    {
+        Player->CurrentInteractable = this;
+        // Show UI prompt, visual feedback
+    }
+}
+
+void AMyInteractable::OnOverlapEnd(...)
+{
+    APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
+    if (Player && Player->CurrentInteractable == this)
+    {
+        Player->CurrentInteractable = nullptr;
+        // Hide UI prompt, visual feedback
+    }
+}
+
+// Implement a TryInteract() or similar that PlayerController calls
 ```
 
 ### Useful Includes
 ```cpp
-#include "Kismet/GameplayStatics.h"      // GetPlayerCharacter, etc.
+#include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/PointLightComponent.h"
 #include "TimerManager.h"
 #include "Engine/DataTable.h"
-#include "Blueprint/UserWidget.h"        // For UMG widgets
-#include "Components/Button.h"           // UMG Button
-#include "Components/TextBlock.h"        // UMG TextBlock
+#include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
+#include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 ```

@@ -8,15 +8,14 @@
 #include "Systems/AbilityManagerComponent.h"
 #include "Components/LevelComponent.h"
 #include "Components/DashComponent.h"
+#include "Actors/Chest.h"
 
 void AMinibonkPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Set initial camera angle
 	SetControlRotation(FRotator(-25.f, 0.f, 0.f));
 
-	// Add Enhanced Input mapping context
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		if (ensure(DefaultMappingContext))
@@ -25,7 +24,6 @@ void AMinibonkPlayerController::BeginPlay()
 		}
 	}
 
-	// Create and initialize the HUD
 	CreateHUD();
 }
 
@@ -46,47 +44,36 @@ void AMinibonkPlayerController::CreateHUD()
 
 	HUDWidget->AddToViewport();
 
-	// Get the player character and connect systems
 	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetPawn());
 	if (!PlayerChar)
 	{
 		return;
 	}
 
-	// Initialize HUD with ability manager
 	if (PlayerChar->AbilityManagerComponent)
 	{
 		HUDWidget->InitializeHUD(PlayerChar->AbilityManagerComponent);
 	}
 
-	// Bind to health changes
 	if (PlayerChar->HealthComponent)
 	{
 		PlayerChar->HealthComponent->OnHealthChanged.AddDynamic(HUDWidget, &UMinibonkHUD::UpdateHealth);
-
-		// Set initial health display
 		HUDWidget->UpdateHealth(
 			PlayerChar->HealthComponent->MaxHealth,
 			PlayerChar->HealthComponent->MaxHealth
 		);
 	}
 
-	// Bind to coin changes
 	if (PlayerChar->CoinComponent)
 	{
 		PlayerChar->CoinComponent->OnCoinsChanged.AddDynamic(HUDWidget, &UMinibonkHUD::UpdateCoins);
-
-		// Set initial coin display
 		HUDWidget->UpdateCoins(PlayerChar->CoinComponent->GetCurrentCoins(), 0);
 	}
 
-	// Bind to level/XP changes
 	if (PlayerChar->LevelComponent)
 	{
 		PlayerChar->LevelComponent->OnLevelUp.AddDynamic(HUDWidget, &UMinibonkHUD::OnLevelUp);
 		PlayerChar->LevelComponent->OnXPChanged.AddDynamic(HUDWidget, &UMinibonkHUD::UpdateXP);
-
-		// Set initial XP display
 		HUDWidget->UpdateXP(
 			PlayerChar->LevelComponent->GetCurrentXP(),
 			PlayerChar->LevelComponent->GetXPForNextLevel(),
@@ -107,7 +94,6 @@ void AMinibonkPlayerController::SetupInputComponent()
 		return;
 	}
 
-	// Bind input actions
 	if (ensure(MoveAction))
 	{
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMinibonkPlayerController::Move);
@@ -128,6 +114,11 @@ void AMinibonkPlayerController::SetupInputComponent()
 	{
 		EnhancedInput->BindAction(DashAction, ETriggerEvent::Started, this, &AMinibonkPlayerController::Dash);
 	}
+
+	if (ensure(InteractAction))
+	{
+		EnhancedInput->BindAction(InteractAction, ETriggerEvent::Started, this, &AMinibonkPlayerController::Interact);
+	}
 }
 
 void AMinibonkPlayerController::Move(const FInputActionValue& Value)
@@ -139,11 +130,8 @@ void AMinibonkPlayerController::Move(const FInputActionValue& Value)
 	}
 
 	const FVector2D MovementVector = Value.Get<FVector2D>();
-
-	// Cache for dash direction
 	LastMovementInput = MovementVector;
 
-	// Calculate camera-relative movement directions
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -161,13 +149,11 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	FRotator CurrentRotation = GetControlRotation();
 	float CurrentPitch = FRotator::NormalizeAxis(CurrentRotation.Pitch);
 
-	// Pitch limits
 	const float MinPitch = -75.f;
 	const float MaxPitch = 75.f;
 	const float ComfortZoneMin = -40.f;
 	const float ComfortZoneMax = 40.f;
 
-	// Slower pitch input in comfort zone for better control
 	float PitchInputScale = 1.f;
 
 	if (CurrentPitch > ComfortZoneMin && CurrentPitch < ComfortZoneMax)
@@ -176,7 +162,6 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	}
 	else
 	{
-		// Scale up input as we approach limits
 		float DistanceIntoEdgeZone = 0.f;
 
 		if (CurrentPitch >= ComfortZoneMax)
@@ -194,7 +179,6 @@ void AMinibonkPlayerController::Look(const FInputActionValue& Value)
 	AddYawInput(LookAxisVector.X);
 	AddPitchInput(-LookAxisVector.Y * PitchInputScale);
 
-	// Hard clamp pitch to prevent camera flip
 	CurrentRotation = GetControlRotation();
 	CurrentPitch = FRotator::NormalizeAxis(CurrentRotation.Pitch);
 	if (CurrentPitch > MaxPitch || CurrentPitch < MinPitch)
@@ -228,19 +212,16 @@ void AMinibonkPlayerController::Dash()
 		return;
 	}
 
-	// Calculate dash direction from movement input (camera-relative)
 	FVector DashDirection;
 
 	if (LastMovementInput.IsNearlyZero())
 	{
-		// No movement input - dash forward (camera direction)
 		const FRotator Rotation = GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		DashDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	}
 	else
 	{
-		// Dash in movement direction
 		const FRotator Rotation = GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
@@ -251,4 +232,25 @@ void AMinibonkPlayerController::Dash()
 	}
 
 	PlayerChar->DashComponent->TryDash(DashDirection);
+}
+
+void AMinibonkPlayerController::Interact()
+{
+	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetPawn());
+	if (!PlayerChar)
+	{
+		return;
+	}
+
+	if (!PlayerChar->CurrentInteractable.IsValid())
+	{
+		UE_LOG(LogTemp, Log, TEXT("Nothing to interact with"));
+		return;
+	}
+
+	AChest* Chest = Cast<AChest>(PlayerChar->CurrentInteractable.Get());
+	if (Chest)
+	{
+		Chest->TryPurchase();
+	}
 }

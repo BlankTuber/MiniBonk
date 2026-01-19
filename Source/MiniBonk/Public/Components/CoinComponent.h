@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Coins")
 	void AddCoins(int32 Amount);
 
+	UFUNCTION(BlueprintCallable, Category = "Coins")
+	bool SpendCoins(int32 Amount);
+
 	UFUNCTION(BlueprintPure, Category = "Coins")
 	int32 GetCurrentCoins() const { return CurrentCoins; }
 

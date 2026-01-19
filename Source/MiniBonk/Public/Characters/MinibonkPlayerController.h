@@ -9,17 +9,19 @@ class UInputAction;
 struct FInputActionValue;
 class UMinibonkHUD;
 
-// Handles all player input and camera control
 UCLASS()
 class MINIBONK_API AMinibonkPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintPure, Category = "UI")
+	UMinibonkHUD* GetHUDWidget() const { return HUDWidget; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
-	// Enhanced Input assets
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
@@ -35,24 +37,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> DashAction;
 
-	// HUD widget class to spawn
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> InteractAction;
+
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMinibonkHUD> HUDWidgetClass;
 
-	// Active HUD widget instance
 	UPROPERTY()
 	TObjectPtr<UMinibonkHUD> HUDWidget;
 
 private:
-	// Input callbacks
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void StartJump();
 	void StopJump();
 	void Dash();
+	void Interact();
 
 	void CreateHUD();
 
-	// Cached movement input for dash direction
 	FVector2D LastMovementInput;
 };

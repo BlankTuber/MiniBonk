@@ -11,14 +11,17 @@ void UMinibonkHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// Start with card selection hidden
 	if (CardSelectionWidget)
 	{
 		CardSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
 		CardSelectionWidget->OnCardSelected.AddDynamic(this, &UMinibonkHUD::OnCardSelected);
 	}
 
-	// Create the card library
+	if (InteractionPromptText)
+	{
+		InteractionPromptText->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
 	CardLibrary = NewObject<UAbilityCardLibrary>(this);
 }
 
@@ -42,10 +45,15 @@ void UMinibonkHUD::OnLevelUp(int32 NewLevel, int32 XPForNextLevel)
 	CurrentPlayerLevel = NewLevel;
 	UE_LOG(LogTemp, Log, TEXT("MinibonkHUD: Level up to %d!"), NewLevel);
 
-	ShowCardSelection();
+	ShowCardSelection(FText::FromString(TEXT("Level Up!")));
 }
 
-void UMinibonkHUD::ShowCardSelection()
+void UMinibonkHUD::TriggerCardSelection(const FText& Title)
+{
+	ShowCardSelection(Title);
+}
+
+void UMinibonkHUD::ShowCardSelection(const FText& Title)
 {
 	if (!CardLibrary || !CardSelectionWidget)
 	{
@@ -53,7 +61,6 @@ void UMinibonkHUD::ShowCardSelection()
 		return;
 	}
 
-	// Generate card choices
 	TArray<FGeneratedCard> Cards = CardLibrary->GenerateCardChoices(CurrentPlayerLevel);
 
 	if (Cards.Num() == 0)
@@ -63,11 +70,12 @@ void UMinibonkHUD::ShowCardSelection()
 		return;
 	}
 
-	// Populate and show the widget
 	CardSelectionWidget->SetCardChoices(Cards);
+	CardSelectionWidget->SetTitle(Title);
 	CardSelectionWidget->SetVisibility(ESlateVisibility::Visible);
 
-	// Show mouse cursor and enable UI input
+	HideInteractionPrompt();
+
 	APlayerController* PC = GetOwningPlayer();
 	if (PC)
 	{
@@ -83,7 +91,6 @@ void UMinibonkHUD::HideCardSelection()
 		CardSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
-	// Restore game input
 	APlayerController* PC = GetOwningPlayer();
 	if (PC)
 	{
@@ -91,7 +98,6 @@ void UMinibonkHUD::HideCardSelection()
 		PC->SetInputMode(FInputModeGameOnly());
 	}
 
-	// Unpause the game
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
@@ -133,5 +139,25 @@ void UMinibonkHUD::UpdateXP(int32 CurrentXP, int32 XPForNextLevel, int32 Current
 	if (LevelText)
 	{
 		LevelText->SetText(FText::Format(INVTEXT("Lv {0}"), CurrentLevel));
+	}
+}
+
+void UMinibonkHUD::ShowInteractionPrompt(const FText& PromptText, bool bCanAfford)
+{
+	if (!InteractionPromptText)
+	{
+		return;
+	}
+
+	InteractionPromptText->SetText(PromptText);
+	InteractionPromptText->SetColorAndOpacity(FSlateColor(bCanAfford ? CanAffordColor : CannotAffordColor));
+	InteractionPromptText->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UMinibonkHUD::HideInteractionPrompt()
+{
+	if (InteractionPromptText)
+	{
+		InteractionPromptText->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }

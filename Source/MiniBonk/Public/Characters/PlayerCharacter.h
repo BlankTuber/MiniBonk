@@ -14,7 +14,6 @@ class UCoinComponent;
 class ULevelComponent;
 class UDashComponent;
 
-// Player's physical body - handles camera setup and movement properties
 UCLASS()
 class MINIBONK_API APlayerCharacter : public ACharacter
 {
@@ -23,44 +22,38 @@ class MINIBONK_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter();
 
-	// Camera setup
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	// Health system
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	TObjectPtr<UHealthComponent> HealthComponent;
 
-	// Movement Stats System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UMovementStatsComponent> MovementStatsComponent;
 
-	// Ability Manager System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	TObjectPtr<UAbilityManagerComponent> AbilityManagerComponent;
 
-	// Stone Throw Ability
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UStoneThrowComponent> StoneThrowComponent;
 
-	// Coin Collection System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Economy")
 	TObjectPtr<UCoinComponent> CoinComponent;
 
-	// Level/XP System
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Progression")
 	TObjectPtr<ULevelComponent> LevelComponent;
 
-	// Dash Ability
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UDashComponent> DashComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
+	TWeakObjectPtr<AActor> CurrentInteractable;
+
 protected:
 	virtual void BeginPlay() override;
-
 
 private:
 	UFUNCTION()

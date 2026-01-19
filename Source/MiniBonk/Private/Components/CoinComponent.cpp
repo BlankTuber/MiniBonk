@@ -28,6 +28,20 @@ void UCoinComponent::AddCoins(int32 Amount)
 	UE_LOG(LogTemp, Log, TEXT("CoinComponent: Collected %d coins. Total: %d"), Amount, CurrentCoins);
 }
 
+bool UCoinComponent::SpendCoins(int32 Amount)
+{
+	if (Amount <= 0 || Amount > CurrentCoins)
+	{
+		return false;
+	}
+
+	CurrentCoins -= Amount;
+	OnCoinsChanged.Broadcast(CurrentCoins, -Amount);
+
+	UE_LOG(LogTemp, Log, TEXT("CoinComponent: Spent %d coins. Remaining: %d"), Amount, CurrentCoins);
+	return true;
+}
+
 void UCoinComponent::SetMagnetRadius(float NewRadius)
 {
 	MagnetRadius = FMath::Clamp(NewRadius, 0.f, MaxMagnetRadius);

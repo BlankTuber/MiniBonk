@@ -33,14 +33,21 @@ public:
 	UFUNCTION()
 	void OnLevelUp(int32 NewLevel, int32 XPForNextLevel);
 
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void TriggerCardSelection(const FText& Title);
+
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void ShowInteractionPrompt(const FText& PromptText, bool bCanAfford);
+
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void HideInteractionPrompt();
+
 protected:
 	virtual void NativeConstruct() override;
 
-	// Card selection widget
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCardSelectionWidget> CardSelectionWidget;
 
-	// HUD Elements
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> HealthBar;
 
@@ -53,9 +60,17 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> LevelText;
 
-	// Data table containing card templates
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> InteractionPromptText;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Cards")
 	TObjectPtr<UDataTable> CardDataTable;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	FLinearColor CanAffordColor = FLinearColor::Green;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	FLinearColor CannotAffordColor = FLinearColor::Red;
 
 private:
 	UPROPERTY()
@@ -69,6 +84,6 @@ private:
 	UFUNCTION()
 	void OnCardSelected(const FGeneratedCard& SelectedCard);
 
-	void ShowCardSelection();
+	void ShowCardSelection(const FText& Title);
 	void HideCardSelection();
 };
