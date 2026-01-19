@@ -8,6 +8,7 @@
 #include "Characters/EnemyAIController.h"
 #include "Actors/Coin.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Systems/KillTrackingSubsystem.h"
 
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -144,6 +145,14 @@ void AEnemyCharacter::DealDamageToPlayer()
 
 void AEnemyCharacter::HandleDeath()
 {
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (UKillTrackingSubsystem* KillTracker = GI->GetSubsystem<UKillTrackingSubsystem>())
+		{
+			KillTracker->NotifyEnemyKilled();
+		}
+	}
+
 	// Spawn coins
 	if (CoinClass)
 	{

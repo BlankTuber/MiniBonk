@@ -59,6 +59,7 @@ The game uses reusable components that can be attached to any actor:
 | `AutoAttackComponent` | Base class for automatic attacks |
 | `StoneThrowComponent` | Projectile auto-attack |
 | `DashComponent` | Player-activated dash attack |
+| ChestSpawnerComponent | Kill-based chest spawning with scaling |
 
 ### Interactables
 ```
@@ -77,6 +78,14 @@ Chest (AChest)
 4. Chest binds to CoinComponent::OnCoinsChanged to update affordability in real-time
 5. Player presses Interact (E) → PlayerController calls Chest::TryPurchase()
 6. On success: spend coins, pause game, trigger card selection, destroy chest
+
+### Subsystems
+```
+KillTrackingSubsystem (UGameInstanceSubsystem)
+├── Tracks total enemy kills across the game
+├── Broadcasts OnEnemyKilled delegate
+└── Other systems (ChestSpawner, future stats/achievements) listen to this
+```
 
 ### Animation System
 ```
@@ -166,6 +175,7 @@ Components listen and modify their stats
 - **Enemy HP:** `BaseHP * (1.0125 ^ ElapsedSeconds)` - exponential growth
 - **Enemy Damage:** `BaseDamage * (1 + ElapsedMinutes * 0.2)` - linear growth
 - **Spawn Rate:** Interval decreases over time (see EnemySpawnerComponent)
+- **Chest spawn kills:** `10 * (1.25 ^ ChestsSpawned)` - exponential growth
 
 ---
 
@@ -196,9 +206,10 @@ Components listen and modify their stats
 - [x] Enemy animations (locomotion)
 - [x] Simple vfx
 - [x] Chest interactable (purchase card rolls with coins)
+- [x] Kill tracking subsystem
+- [x] Chest spawner (kill-based with scaling)
 
 ### Next Up
-- [ ] Chest spawner
 - [ ] Audio / sfx
 - [ ] Death animations (player and enemy)
 - [ ] Map
