@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Dash|Limits")
 	float MaxDistance = 1500.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> DashSound;
+
 private:
 	UPROPERTY()
 	TObjectPtr<UAbilityManagerComponent> AbilityManager;

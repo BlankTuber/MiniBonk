@@ -44,6 +44,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Coin")
 	float ValueScalePerMinute = 1.37f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> PickupSound;
+
 private:
 	int32 Value = 1;
 

@@ -132,6 +132,11 @@ void UDashComponent::PerformDash(const FVector& Direction)
 
 	LastDashTime = GetWorld()->GetTimeSeconds();
 
+	if (DashSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DashSound, GetOwner()->GetActorLocation());
+	}
+
 	// Get current stats from ability manager
 	float CurrentDistance = GetCurrentDistance();
 	CurrentDashDamage = GetCurrentDamage();

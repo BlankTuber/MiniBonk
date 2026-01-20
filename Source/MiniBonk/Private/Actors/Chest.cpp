@@ -103,6 +103,11 @@ bool AChest::TryPurchase()
 
 	UE_LOG(LogTemp, Log, TEXT("Chest: Purchased for %d coins!"), CurrentCost);
 
+	if (PurchaseSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PurchaseSound, GetActorLocation());
+	}
+
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 
 	AMinibonkPlayerController* PC = Cast<AMinibonkPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));

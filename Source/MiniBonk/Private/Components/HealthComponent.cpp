@@ -1,6 +1,7 @@
 #include "Components/HealthComponent.h"
 #include "Systems/AbilityTypes.h"
 #include "Systems/AbilityMath.h"
+#include "Kismet/GameplayStatics.h"
 
 UHealthComponent::UHealthComponent()
 {
@@ -40,11 +41,21 @@ void UHealthComponent::TakeDamage(float DamageAmount)
 
 	OnDamageTaken.Broadcast(DamageAmount, GetOwner()->GetActorLocation());
 
+	if (DamageSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DamageSound, GetOwner()->GetActorLocation());
+	}
+
 	// Check for death
 	if (CurrentHealth <= 0.f)
 	{
 		bIsDead = true;
 		OnDeath.Broadcast();
+		
+		if (DeathSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetOwner()->GetActorLocation());
+		}
 	}
 }
 

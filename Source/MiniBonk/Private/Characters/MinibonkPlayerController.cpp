@@ -9,10 +9,16 @@
 #include "Components/LevelComponent.h"
 #include "Components/DashComponent.h"
 #include "Actors/Chest.h"
+#include "Kismet/GameplayStatics.h"
 
 void AMinibonkPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (BackgroundMusic)
+	{
+		UGameplayStatics::PlaySound2D(this, BackgroundMusic, MusicVolume);
+	}
 
 	SetControlRotation(FRotator(-25.f, 0.f, 0.f));
 

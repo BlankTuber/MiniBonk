@@ -2,6 +2,7 @@
 #include "Components/SphereComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "Components/CoinComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ACoin::ACoin()
 {
@@ -78,6 +79,11 @@ void ACoin::OnCollectionOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	if (Player->CoinComponent)
 	{
 		Player->CoinComponent->AddCoins(Value);
+	}
+
+	if (PickupSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 	}
 
 	Destroy();

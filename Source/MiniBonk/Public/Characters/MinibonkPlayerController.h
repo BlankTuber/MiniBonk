@@ -46,6 +46,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UMinibonkHUD> HUDWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> BackgroundMusic;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	float MusicVolume = 0.5f;
+
 private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);

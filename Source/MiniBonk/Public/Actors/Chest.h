@@ -58,6 +58,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Chest|Visual")
 	float LightRadius = 300.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	TObjectPtr<USoundBase> PurchaseSound;
+
 private:
 	int32 CurrentCost = 0;
 	TWeakObjectPtr<APlayerCharacter> OverlappingPlayer;

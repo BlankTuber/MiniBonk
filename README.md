@@ -208,17 +208,16 @@ Components listen and modify their stats
 - [x] Chest interactable (purchase card rolls with coins)
 - [x] Kill tracking subsystem
 - [x] Chest spawner (kill-based with scaling)
+- [X] Audio / sfx
+- [X] Map
 
 ### Next Up
-- [ ] Audio / sfx
 - [ ] Death animations (player and enemy)
-- [ ] Map
 - [ ] Game over screen
-
-### Future
 - [ ] Melee attack (slash component)
 - [ ] More enemy types
 - [ ] Boss enemies
+
 
 ---
 
