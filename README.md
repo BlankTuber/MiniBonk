@@ -210,11 +210,11 @@ Components listen and modify their stats
 - [x] Chest spawner (kill-based with scaling)
 - [X] Audio / sfx
 - [X] Map
+- [X] New attack: Orbital stones
 
 ### Next Up
 - [ ] Death animations (player and enemy)
 - [ ] Game over screen
-- [ ] Melee attack (slash component)
 - [ ] More enemy types
 - [ ] Boss enemies
 

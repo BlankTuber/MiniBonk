@@ -85,6 +85,9 @@ struct FAbilityCard : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "bLocksUnlock"))
 	FName LockedUnlockID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName RequiredUnlock;
 };
 
 USTRUCT(BlueprintType)

@@ -13,6 +13,7 @@ class UStoneThrowComponent;
 class UCoinComponent;
 class ULevelComponent;
 class UDashComponent;
+class UOrbitalStoneComponent;
 
 UCLASS()
 class MINIBONK_API APlayerCharacter : public ACharacter
@@ -48,6 +49,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UDashComponent> DashComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UOrbitalStoneComponent> OrbitalStoneComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interaction")
 	TWeakObjectPtr<AActor> CurrentInteractable;

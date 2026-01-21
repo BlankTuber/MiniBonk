@@ -8,6 +8,7 @@
 #include "Systems/AbilityManagerComponent.h"
 #include "Components/LevelComponent.h"
 #include "Components/DashComponent.h"
+#include "Components/CoinComponent.h"
 #include "Actors/Chest.h"
 #include "Kismet/GameplayStatics.h"
 

@@ -149,8 +149,12 @@ FGeneratedCard UAbilityCardLibrary::ScaleCardTemplate(const FAbilityCard* Templa
 	// Apply rare boost for non-curse cards
 	if (bIsRare && !Template->bIsCurse)
 	{
-		float BoostMultiplier = FMath::RandRange(2.f, 3.f);
+		float BaseBoost = FMath::RandRange(2.f, 3.f);
+		float BoostMultiplier = BaseBoost * Template->RareBoostMultiplier;
 		Generated.Value *= BoostMultiplier;
+
+		UE_LOG(LogTemp, Log, TEXT("AbilityCardLibrary: RARE card! %s boosted by %.1fx"),
+			*Template->CardName.ToString(), BoostMultiplier);
 	}
 
 	// Copy curse properties
@@ -193,6 +197,15 @@ bool UAbilityCardLibrary::IsCardAvailable(const FAbilityCard* Card) const
 		}
 
 		if (AbilityManager->IsUnlockLocked(Card->AffectsAbility))
+		{
+			return false;
+		}
+	}
+
+	// Check if this card requires an unlock first
+	if (!Card->RequiredUnlock.IsNone())
+	{
+		if (!AbilityManager->IsUnlockAcquired(Card->RequiredUnlock))
 		{
 			return false;
 		}

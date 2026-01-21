@@ -8,6 +8,7 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 class UMinibonkHUD;
+class UCoinComponent;
 
 UCLASS()
 class MINIBONK_API AMinibonkPlayerController : public APlayerController

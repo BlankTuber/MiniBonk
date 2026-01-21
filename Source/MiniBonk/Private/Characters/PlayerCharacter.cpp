@@ -8,6 +8,7 @@
 #include "Components/DashComponent.h"
 #include "Components/CoinComponent.h"
 #include "Components/LevelComponent.h"
+#include "Components/OrbitalStoneComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Systems/AbilityManagerComponent.h"
 
@@ -71,6 +72,8 @@ APlayerCharacter::APlayerCharacter()
 
 	// Dash Component
 	DashComponent = CreateDefaultSubobject<UDashComponent>(TEXT("DashComponent"));
+
+	OrbitalStoneComponent = CreateDefaultSubobject<UOrbitalStoneComponent>(TEXT("OrbitalStoneComponent"));
 }
 
 void APlayerCharacter::BeginPlay()
