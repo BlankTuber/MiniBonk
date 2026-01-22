@@ -211,13 +211,11 @@ Components listen and modify their stats
 - [X] Audio / sfx
 - [X] Map
 - [X] New attack: Orbital stones
+- [X] Boss enemies
 
 ### Next Up
-- [ ] Death animations (player and enemy)
+- [ ] Start Screen
 - [ ] Game over screen
-- [ ] More enemy types
-- [ ] Boss enemies
-
 
 ---
 
