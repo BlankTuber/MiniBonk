@@ -5,6 +5,7 @@
 #include "MinibonkHUD.generated.h"
 
 class UCardSelectionWidget;
+class UGameOverWidget;
 class UAbilityCardLibrary;
 class UAbilityManagerComponent;
 class UDataTable;
@@ -42,6 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	void HideInteractionPrompt();
 
+	UFUNCTION(BlueprintCallable, Category = "HUD")
+	void ShowGameOver(int32 Kills, float TimeSurvived, int32 LevelReached, int32 CoinsCollected);
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -50,6 +54,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> HealthBar;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> CoinExplainer;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> CoinText;
@@ -71,6 +78,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
 	FLinearColor CannotAffordColor = FLinearColor::Red;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UGameOverWidget> GameOverWidget;
 
 private:
 	UPROPERTY()

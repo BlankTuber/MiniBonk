@@ -212,10 +212,11 @@ Components listen and modify their stats
 - [X] Map
 - [X] New attack: Orbital stones
 - [X] Boss enemies
+- [X] Start Screen
+- [X] Game over screen
 
 ### Next Up
-- [ ] Start Screen
-- [ ] Game over screen
+- [ ] Bug Fixes
 
 ---
 

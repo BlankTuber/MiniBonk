@@ -31,6 +31,9 @@ void AMinibonkPlayerController::BeginPlay()
 		}
 	}
 
+	bShowMouseCursor = false;
+	SetInputMode(FInputModeGameOnly());
+
 	CreateHUD();
 }
 

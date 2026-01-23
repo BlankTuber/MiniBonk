@@ -12,6 +12,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Systems/AbilityManagerComponent.h"
 
+// For Game Over Widget
+#include "Characters/MinibonkPlayerController.h"
+#include "UI/MinibonkHUD.h"
+#include "Systems/KillTrackingSubsystem.h"
+
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -105,5 +110,29 @@ void APlayerCharacter::BeginPlay()
 
 void APlayerCharacter::HandleDeath()
 {
-	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()));
+	AMinibonkPlayerController* PC = Cast<AMinibonkPlayerController>(GetController());
+	if (!PC)
+	{
+		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()));
+		return;
+	}
+
+	UMinibonkHUD* HUD = PC->GetHUDWidget();
+	if (!HUD)
+	{
+		UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()));
+		return;
+	}
+
+	int32 Kills = 0;
+	if (UKillTrackingSubsystem* KillTracker = GetGameInstance()->GetSubsystem<UKillTrackingSubsystem>())
+	{
+		Kills = KillTracker->GetTotalKills();
+	}
+
+	float TimeSurvived = GetWorld()->GetTimeSeconds();
+	int32 Level = LevelComponent ? LevelComponent->GetCurrentLevel() : 1;
+	int32 Coins = CoinComponent ? CoinComponent->GetCurrentCoins() : 0;
+
+	HUD->ShowGameOver(Kills, TimeSurvived, Level, Coins);
 }

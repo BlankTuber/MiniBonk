@@ -1,5 +1,6 @@
 #include "UI/MinibonkHUD.h"
 #include "UI/CardSelectionWidget.h"
+#include "UI/GameOverWidget.h"
 #include "Systems/AbilityCardLibrary.h"
 #include "Systems/AbilityManagerComponent.h"
 #include "Systems/AbilityTypes.h"
@@ -15,6 +16,11 @@ void UMinibonkHUD::NativeConstruct()
 	{
 		CardSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
 		CardSelectionWidget->OnCardSelected.AddDynamic(this, &UMinibonkHUD::OnCardSelected);
+	}
+
+	if (GameOverWidget)
+	{
+		GameOverWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
 	if (InteractionPromptText)
@@ -160,4 +166,57 @@ void UMinibonkHUD::HideInteractionPrompt()
 	{
 		InteractionPromptText->SetVisibility(ESlateVisibility::Collapsed);
 	}
+}
+
+void UMinibonkHUD::ShowGameOver(int32 Kills, float TimeSurvived, int32 LevelReached, int32 CoinsCollected)
+{
+	// Hide regular HUD elements
+	if (CardSelectionWidget)
+	{
+		CardSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (HealthBar)
+	{
+		HealthBar->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (CoinExplainer)
+	{
+		CoinExplainer->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (CoinText)
+	{
+		CoinText->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (XPBar)
+	{
+		XPBar->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (LevelText)
+	{
+		LevelText->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	HideInteractionPrompt();
+
+	// Show game over
+	if (GameOverWidget)
+	{
+		GameOverWidget->SetStats(Kills, TimeSurvived, LevelReached, CoinsCollected);
+		GameOverWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+
+	// Enable mouse cursor
+	APlayerController* PC = GetOwningPlayer();
+	if (PC)
+	{
+		PC->bShowMouseCursor = true;
+		PC->SetInputMode(FInputModeUIOnly());
+	}
+
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }
