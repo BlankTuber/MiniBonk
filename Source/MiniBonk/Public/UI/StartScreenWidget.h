@@ -25,8 +25,8 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnPlayClicked();
+	void OnPlayPressed();
 
 	UFUNCTION()
-	void OnQuitClicked();
+	void OnQuitPressed();
 };

@@ -6,19 +6,21 @@ void UCardSelectionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// Bind button click events
 	if (Card0Button)
 	{
+		Card0Button->OnClicked.RemoveDynamic(this, &UCardSelectionWidget::OnCard0Clicked);
 		Card0Button->OnClicked.AddDynamic(this, &UCardSelectionWidget::OnCard0Clicked);
 	}
 
 	if (Card1Button)
 	{
+		Card1Button->OnClicked.RemoveDynamic(this, &UCardSelectionWidget::OnCard1Clicked);
 		Card1Button->OnClicked.AddDynamic(this, &UCardSelectionWidget::OnCard1Clicked);
 	}
 
 	if (Card2Button)
 	{
+		Card2Button->OnClicked.RemoveDynamic(this, &UCardSelectionWidget::OnCard2Clicked);
 		Card2Button->OnClicked.AddDynamic(this, &UCardSelectionWidget::OnCard2Clicked);
 	}
 }

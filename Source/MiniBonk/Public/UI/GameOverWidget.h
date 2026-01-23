@@ -39,10 +39,10 @@ protected:
 
 private:
 	UFUNCTION()
-	void OnRestartClicked();
+	void OnRestartPressed();
 
 	UFUNCTION()
-	void OnQuitClicked();
+	void OnQuitPressed();
 
 	FString FormatTime(float Seconds) const;
 };

@@ -9,13 +9,29 @@ void UGameOverWidget::NativeConstruct()
 
 	if (RestartButton)
 	{
-		RestartButton->OnClicked.AddDynamic(this, &UGameOverWidget::OnRestartClicked);
+		RestartButton->OnPressed.RemoveDynamic(this, &UGameOverWidget::OnRestartPressed);
+		RestartButton->OnPressed.AddDynamic(this, &UGameOverWidget::OnRestartPressed);
 	}
 
 	if (QuitButton)
 	{
-		QuitButton->OnClicked.AddDynamic(this, &UGameOverWidget::OnQuitClicked);
+		QuitButton->OnPressed.RemoveDynamic(this, &UGameOverWidget::OnQuitPressed);
+		QuitButton->OnPressed.AddDynamic(this, &UGameOverWidget::OnQuitPressed);
 	}
+}
+
+void UGameOverWidget::OnRestartPressed()
+{
+	UE_LOG(LogTemp, Error, TEXT("########## OnRestartPressed FIRED ##########"));
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()));
+}
+
+void UGameOverWidget::OnQuitPressed()
+{
+	UE_LOG(LogTemp, Error, TEXT("########## OnQuitPressed FIRED ##########"));
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }
 
 void UGameOverWidget::SetStats(int32 Kills, float TimeSurvived, int32 LevelReached, int32 CoinsCollected)
@@ -46,17 +62,4 @@ FString UGameOverWidget::FormatTime(float Seconds) const
 	int32 Minutes = FMath::FloorToInt(Seconds / 60.f);
 	int32 Secs = FMath::FloorToInt(FMath::Fmod(Seconds, 60.f));
 	return FString::Printf(TEXT("%d:%02d"), Minutes, Secs);
-}
-
-void UGameOverWidget::OnRestartClicked()
-{
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
-	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()));
-}
-
-void UGameOverWidget::OnQuitClicked()
-{
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
-
-	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }

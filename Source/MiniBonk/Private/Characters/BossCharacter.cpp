@@ -1,5 +1,6 @@
 #include "Characters/BossCharacter.h"
 #include "Components/HealthComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Actors/BossGroundAttack.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
@@ -12,6 +13,13 @@ ABossCharacter::ABossCharacter()
 void ABossCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	if (Capsule)
+	{
+		Capsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	}
+
 
 	if (HealthComponent)
 	{

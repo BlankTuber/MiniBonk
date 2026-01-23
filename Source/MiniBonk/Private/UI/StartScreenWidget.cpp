@@ -5,25 +5,29 @@
 
 void UStartScreenWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	if (PlayButton)
-	{
-		PlayButton->OnClicked.AddDynamic(this, &UStartScreenWidget::OnPlayClicked);
-	}
+    if (PlayButton)
+    {
+        PlayButton->OnPressed.RemoveDynamic(this, &UStartScreenWidget::OnPlayPressed);
+        PlayButton->OnPressed.AddDynamic(this, &UStartScreenWidget::OnPlayPressed);
+    }
 
-	if (QuitButton)
-	{
-		QuitButton->OnClicked.AddDynamic(this, &UStartScreenWidget::OnQuitClicked);
-	}
+    if (QuitButton)
+    {
+        QuitButton->OnPressed.RemoveDynamic(this, &UStartScreenWidget::OnQuitPressed);
+        QuitButton->OnPressed.AddDynamic(this, &UStartScreenWidget::OnQuitPressed);
+    }
 }
 
-void UStartScreenWidget::OnPlayClicked()
+void UStartScreenWidget::OnPlayPressed()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), GameLevelName);
+    UE_LOG(LogTemp, Error, TEXT("########## OnPlayPressed FIRED ##########"));
+    UGameplayStatics::OpenLevel(GetWorld(), GameLevelName);
 }
 
-void UStartScreenWidget::OnQuitClicked()
+void UStartScreenWidget::OnQuitPressed()
 {
-	UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
+    UE_LOG(LogTemp, Error, TEXT("########## OnQuitPressed FIRED ##########"));
+    UKismetSystemLibrary::QuitGame(GetWorld(), nullptr, EQuitPreference::Quit, false);
 }

@@ -10,7 +10,8 @@ AStoneProjectile::AStoneProjectile()
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->InitSphereRadius(15.f);
-	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionComponent->SetCollisionObjectType(ECC_WorldDynamic);
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	CollisionComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
@@ -59,6 +60,9 @@ void AStoneProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAct
 	}
 
 	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OtherActor);
+	
+	UE_LOG(LogTemp, Warning, TEXT("StoneProjectile::OnHit - Cast to Enemy: %s"), Enemy ? TEXT("SUCCESS") : TEXT("FAILED"));
+
 	if (Enemy)
 	{
 		UHealthComponent* HealthComp = Enemy->HealthComponent;

@@ -15,6 +15,7 @@ void UMinibonkHUD::NativeConstruct()
 	if (CardSelectionWidget)
 	{
 		CardSelectionWidget->SetVisibility(ESlateVisibility::Collapsed);
+		CardSelectionWidget->OnCardSelected.RemoveDynamic(this, &UMinibonkHUD::OnCardSelected);
 		CardSelectionWidget->OnCardSelected.AddDynamic(this, &UMinibonkHUD::OnCardSelected);
 	}
 
